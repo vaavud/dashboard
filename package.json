@@ -1,0 +1,29 @@
+{
+  "name": "dashboard",
+  "version": "1.0.0",
+  "description": "Dashboard for showing KPIs (Maria's thesis)",
+  "main": "main.js",
+  "dependencies": {
+    "firebase": "^2.4.1",
+    "highcharts-browserify": "^2.0.2",
+    "jquery": "^2.2.2"
+  },
+  "devDependencies": {
+    "browserify": "^13.0.0",
+    "watchify": "^3.7.0"
+  },
+  "scripts": {
+    "build": "browserify scr/main.js -o public/bundle.js",
+    "watch": "watchify scr/main.js -o public/bundle.js --debug"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vaavud/dashboard.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vaavud/dashboard/issues"
+  },
+  "homepage": "https://github.com/vaavud/dashboard#readme"
+}

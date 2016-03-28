@@ -1,95 +1,3 @@
-"use strict"
-
-/*
-Login to firebase
-*/
-
-var ref = new Firebase('https://shining-torch-4752.firebaseio.com/');
-$(document).ready(function() {
-  ref.authWithPassword({
-    email: "maria@vaavud.com",
-    password: "1234"
-  }, authHandler);
-})
-
-$('#password').keypress(function(e) {
-  if (e.keyCode == 13) {
-    var email = $('#email').val();
-    var password = $('#password').val();
-
-    ref.authWithPassword({
-      email: email,
-      password: password
-    }, authHandler);
-
-    $('#password').val('');
-  }
-});
-
-function authHandler(error, authData) {
-  if (error) {
-    console.log("Login Failed!", error);
-  } else {
-    console.log("Authenticated successfully with payload:", authData);
-
-    get3PartyDetails()
-  }
-}
-
-/*
-Retrive login credentials from firebase to e-conomic
-*/
-
-function get3PartyDetails() {
-  ref.child('/').once("value", function(snap) {
-    console.log(`data loaded! ${Object.keys(snap.val()).length}`);
-    getEconomicData(snap.val()["E-conomic"]);
-    var iOSData = getAmplitudeData(snap.val()["Amplitude-iOS"]);
-    var androidData = getAmplitudeData(snap.val()["Amplitude-Android"]);
-
-    // something get other data here
-  });
-}
-
-/*
-Retrieve Amplitude data
-*/
-function getAmplitudeData(login){
-  getAmplitudeLogin(login, "users?m=active&start=20160101&end=20160327&i=1&g=country")
-  .then(result => {
-    console.log(result)
-  })
-  var measurementsTotal = getAmplitudeLogin(login, "events?e=Measure::Began&start=20160101&end=20160327")
-  .then(result => {
-    console.log(result)
-  })
-
-  // Promise.all([activeUsers, measurementsTotal])
-  //   .then(data => {
-  //
-  //   })
-}
-
-function getAmplitudeLogin(login, parameter) {
-  return new Promise((resolve, reject) => {
-    $.ajax({
-        url: `https://amplitude.com/api/2/${parameter}`,
-        dataType: "json",
-        xhrFields: {
-          withCredentials: true
-        },
-        headers: {
-          "Authorization": "Basic " + btoa(login.APIKey + ":" + login.SecretKey)
-        },
-        type: "GET"
-      })
-      // .always( resolve ); // resolve is a function that takes one parameter (and passes on this value)
-      .always(function(result) {
-        resolve(result)
-      })
-  })
-}
-
 /*
 Retrive e-conomic data
 */
@@ -178,7 +86,7 @@ class EconomicChart {
     options.series[2].data = accSum
 
 
-    $('#container').highcharts(options)
+    new Highcharts.Chart('container', options)
       // $("#output").text(JSON.stringify(weekSum, null, 4));
 
   }
