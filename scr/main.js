@@ -51,7 +51,12 @@ function get3PartyDetails() {
     var economicData = Economic.getData(snap.val()["E-conomic"]);
     economicData.then(data => {
       var options = Economic.chartOptions(data)
-      new Highcharts.chart('container', options)
+      new Highcharts.chart('container1', options)
+      new Highcharts.chart('container2', options)
+      new Highcharts.chart('container3', options)
+      new Highcharts.chart('container4', options)
+      new Highcharts.chart('container5', options)
+      new Highcharts.chart('container6', options)
     })
     // var iOSData = getAmplitudeData(snap.val()["Amplitude-iOS"]);
     // var androidData = getAmplitudeData(snap.val()["Amplitude-Android"]);
