@@ -5,6 +5,7 @@
   "main": "main.js",
   "dependencies": {
     "firebase": "^2.4.1",
+    "highcharts": "^4.2.3",
     "highcharts-browserify": "^2.0.2",
     "jquery": "^2.2.2"
   },
