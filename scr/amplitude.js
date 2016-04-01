@@ -1,16 +1,18 @@
+var $ = require('jquery')
+
 /*
 Retrieve Amplitude data
 */
-function getAmplitudeData(login){
-  getAmplitudeLogin(login, "users?m=active&start=20160101&end=20160327&i=1&g=country")
-  .then(result => {
-    console.log(result)
-  })
-  var measurementsTotal = getAmplitudeLogin(login, "events?e=Measure::Began&start=20160101&end=20160327")
-  .then(result => {
-    console.log(result)
-  })
+function getData(login){
 
+  getAmplitudeLogin(login, "users?m=active&start=20160101&end=20160301&i=1")
+  .then(result => {
+    console.log(result)
+  })
+  // var measurementsTotal = getAmplitudeLogin(login, "events?e=Measure::Began&start=20160101&end=20160327")
+  // .then(result => {
+  //   console.log(result)
+  // })
   // Promise.all([activeUsers, measurementsTotal])
   //   .then(data => {
   //
@@ -20,8 +22,7 @@ function getAmplitudeData(login){
 function getAmplitudeLogin(login, parameter) {
   return new Promise((resolve, reject) => {
     $.ajax({
-        url: `https://amplitude.com/api/2/${parameter}`,
-        dataType: "json",
+        url: `https://localhost:8083/amplitude/api/2/${parameter}`,
         xhrFields: {
           withCredentials: true
         },
@@ -35,4 +36,8 @@ function getAmplitudeLogin(login, parameter) {
         resolve(result)
       })
   })
+}
+
+module.exports = {
+  getData: getData
 }

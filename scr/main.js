@@ -4,6 +4,7 @@ var Firebase = require('firebase')
 var Highcharts = require('highcharts')
 
 var Economic = require('./economic.js')
+var Amplitude = require('./amplitude.js')
 
 /*
 Login to firebase
@@ -58,7 +59,8 @@ function get3PartyDetails() {
       new Highcharts.chart('container5', options)
       new Highcharts.chart('container6', options)
     })
-    // var iOSData = getAmplitudeData(snap.val()["Amplitude-iOS"]);
+
+    var iOSData = Amplitude.getData(snap.val()["Amplitude-iOS"]);
     // var androidData = getAmplitudeData(snap.val()["Amplitude-Android"]);
 
     // something get other data here
