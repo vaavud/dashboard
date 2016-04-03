@@ -143,15 +143,21 @@ function chartOptions(data) {
   var weekSum = data.week
   var accSum = data.acc
   var options = defaultOptions
+  var budget = []
+  var accBudget = []
   var weekNumbers = []
   for (var i = 0; i < weekSum.length; i++) {
     weekNumbers[i] = i + 1
+    budget[i] = 37756
+    accBudget[i] = 37756*(i+1)
   }
 
   options.xAxis[0].categories = weekNumbers
   options.series[0].data = weekSum
+  options.series[1].data = budget
   options.series[2].data = accSum
-  console.log(accSum)
+  options.series[3].data = accBudget
+  console.log(budget)
   return options
 }
 
@@ -192,7 +198,7 @@ var defaultOptions = {
   }, {
     name: 'Budget',
     type: 'column',
-    data: [37756, 37756, 37756, 37756, 37756, 37756, 37756, 37756, 37756, 37756, 37756, 37756, 37756],
+    data: [],
     tooltip: { valueSuffix: ' DKK' }
   }, {
     name: 'Acc. sale',
@@ -204,7 +210,7 @@ var defaultOptions = {
     name: 'Acc, budget',
     type: 'spline',
     // yAxis: 1,
-    data: [37756, 37756 * 2, 37756 * 3, 37756 * 4, 37756 * 5, 37756 * 6, 37756 * 7, 37756 * 8, 37756 * 9, 37756 * 10, 37756 * 11],
+    data: [],
     tooltip: { valueSuffix: ' DKK' }
   }]
 }
