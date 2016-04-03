@@ -96,7 +96,6 @@ function accWeek(data) { // 1 Array of arrays of entries
 
 function accYTD(weekSum) {
   var accYTD = Utility.weekZerosArray()
-  console.log(accYTD)
   var sum = 0
   for (var i = 0; i < weekSum.length; i++) {
     sum += weekSum[i]
@@ -109,7 +108,6 @@ function accYTD(weekSum) {
 class Utility {
   static weekZerosArray() {
       var currentWeek = Utility.getWeekNumber(new Date())[1]
-      console.log(currentWeek);
       return new Array(currentWeek).fill(0)
     }
     // parse a date in yyyy-mm-dd format
@@ -157,7 +155,6 @@ function chartOptions(data) {
   options.series[1].data = budget
   options.series[2].data = accSum
   options.series[3].data = accBudget
-  console.log(budget)
   return options
 }
 

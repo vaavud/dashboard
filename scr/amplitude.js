@@ -12,6 +12,8 @@ function getData(login){
   getAmplitudeLogin(login, "users?m=active&start=20160104&end=" + todaysDate + "&i=7")
   .then(result => {
     console.log(result)
+    var test = keyData(result)
+    console.log(test)
   })
   // var measurementsTotal = getAmplitudeLogin(login, "events?e=Measure::Began&start=20160101&end=20160327")
   // .then(result => {
@@ -43,16 +45,15 @@ function getAmplitudeLogin(login, parameter) {
   })
 }
 
-// function keyData(data) { // 1 Array of arrays of entries
-//   var users = []
-//   for (var i = 0; i < data.[0].length; i++) {
-//     var s = sumWeeks(data[0].[i])
-//     for (var j = 0; j < s.length; j++) {
-//       accWeekSum[j] += Math.round(s[j])
-//     }
-//   }
-//   return accWeekSum
-// }
+function keyData(data) {
+  var length = data[0].length
+  var users = new Array(length)
+  for (var i = 0; i < data[0].length; i++) {
+    var users = data[0][i]
+  }
+  console.log(users)
+  return users
+}
 
 function chartOptions(data) {
   var weekSum = data.week
