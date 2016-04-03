@@ -19,7 +19,6 @@ function getData(login){
   //   })
 }
 
-//         url: `https://localhost:8083/amplitude/api/2/${parameter}`,
 
 function getAmplitudeLogin(login, parameter) {
   return new Promise((resolve, reject) => {
@@ -40,41 +39,6 @@ function getAmplitudeLogin(login, parameter) {
   })
 }
 
-
-
-// function getAmplitudeLogin(login, parameter) {
-//   return new Promise((resolve, reject) => {
-//     $.ajax({
-//         url: `https://localhost:8083/amplitude/api/2/${parameter}`,
-//         xhrFields: {
-//           withCredentials: true
-//         },
-//         headers: {
-//           "Authorization": "Basic " + btoa(login.APIKey + ":" + login.SecretKey)
-//         },
-//         type: "GET"
-//       })
-//       // .always( resolve ); // resolve is a function that takes one parameter (and passes on this value)
-//       .always(function(result) {
-//         resolve(result)
-//       })
-//   })
-// }
-
-
-//
-// function getAmplitudeLogin(login, parameter) {
-//   return new Promise((resolve, reject) => {
-//     $.ajax({
-//         url: `https://api.vaavud.com/dashboard/amplitude/api/2/${parameter}&apiKey=${login.APIKey}&secretKey=${login.SecretKey}`,
-//         type: "GET"
-//       })
-//       // .always( resolve ); // resolve is a function that takes one parameter (and passes on this value)
-//       .always(function(result) {
-//         resolve(result)
-//       })
-//   })
-// }
 
 module.exports = {
   getData: getData

@@ -5,6 +5,7 @@ var Highcharts = require('highcharts')
 
 var Economic = require('./economic.js')
 var Amplitude = require('./amplitude.js')
+var Mailchimp = require('./mailchimp.js')
 
 /*
 Login to firebase
@@ -60,9 +61,12 @@ function get3PartyDetails() {
       new Highcharts.chart('container6', options)
     })
 
+    // Amplitude data
     var iOSData = Amplitude.getData(snap.val()["Amplitude-iOS"]);
     // var androidData = getAmplitudeData(snap.val()["Amplitude-Android"]);
 
+    // Mailchimp data
+    var mailchimp = Mailchimp.getData(snap.val()["Mailchimp"]);
     // something get other data here
   });
 }
