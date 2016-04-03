@@ -1,11 +1,15 @@
 var $ = require('jquery')
+var Highcharts = require('highcharts')
 
 /*
 Retrieve Amplitude data
 */
 function getData(login){
+  var todayOj = new Date()
+  var todaysDate = todayOj.toISOString().slice(0,10).replace(/-/g, "")
+  console.log(todaysDate)
 
-  getAmplitudeLogin(login, "users?m=active&start=20160101&end=20160301&i=1")
+  getAmplitudeLogin(login, "users?m=active&start=20160104&end=" + todaysDate + "&i=7")
   .then(result => {
     console.log(result)
   })
@@ -39,7 +43,71 @@ function getAmplitudeLogin(login, parameter) {
   })
 }
 
+// function keyData(data) { // 1 Array of arrays of entries
+//   var users = []
+//   for (var i = 0; i < data.[0].length; i++) {
+//     var s = sumWeeks(data[0].[i])
+//     for (var j = 0; j < s.length; j++) {
+//       accWeekSum[j] += Math.round(s[j])
+//     }
+//   }
+//   return accWeekSum
+// }
+
+function chartOptions(data) {
+  var weekSum = data.week
+
+  var options = chart
+
+  var weekNumbers = []
+  for (var i = 0; i < weekSum.length; i++) {
+    weekNumbers[i] = i + 1
+  }
+
+  options.xAxis[0].categories = weekNumbers
+  options.series[0].data = weekSum
+
+  return options
+}
+
+var chart = {
+  chart: { zoomType: 'xy' },
+  title: { text: 'Active users 2016' },
+  subtitle: { text: 'Source: amplitude' },
+  xAxis: [{
+    title: { text: "Week no." },
+    categories: [],
+    crosshair: true
+  }],
+  yAxis: [{ // Primary yAxis
+      labels: { style: { color: Highcharts.getOptions().colors[1] } },
+      title: {
+        text: 'Amount (no)',
+        style: { color: Highcharts.getOptions().colors[1] }
+      }
+    }
+  ],
+  tooltip: { shared: true },
+  legend: {
+    layout: 'vertical',
+    align: 'left',
+    x: 120,
+    verticalAlign: 'top',
+    y: 100,
+    floating: true,
+    backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
+  },
+  series: [{
+    name: 'Invoiced sale',
+    type: 'column',
+    data: [],
+    tooltip: {
+      valueSuffix: ' DKK'
+    }
+  }]
+}
 
 module.exports = {
   getData: getData
+  // chartOptions: chartOptions
 }

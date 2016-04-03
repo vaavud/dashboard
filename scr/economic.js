@@ -142,7 +142,7 @@ class Utility {
 function chartOptions(data) {
   var weekSum = data.week
   var accSum = data.acc
-  var options = defaultOptions
+  var options = chart
   var budget = []
   var accBudget = []
   var weekNumbers = []
@@ -161,7 +161,7 @@ function chartOptions(data) {
   return options
 }
 
-var defaultOptions = {
+var chart = {
   chart: { zoomType: 'xy' },
   title: { text: 'Sales 2016' },
   subtitle: { text: 'Source: e-conomic.dk' },

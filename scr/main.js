@@ -63,7 +63,9 @@ function get3PartyDetails() {
 
     // Amplitude data
     var iOSData = Amplitude.getData(snap.val()["Amplitude-iOS"]);
-    // var androidData = getAmplitudeData(snap.val()["Amplitude-Android"]);
+    // iOSData.then(data => {
+    //   var options = Amplitude.chartOptions(data)
+    //var androidData = Amplitude.getData(snap.val()["Amplitude-Android"]);
 
     // Mailchimp data
     //var mailchimp = Mailchimp.getData(snap.val()["Mailchimp"]);
