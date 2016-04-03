@@ -73,9 +73,10 @@ function getEconomicAccount(login, account) {
 function sumWeeks(entries) {
   var weekSum = Utility.weekZerosArray()
   for (var i = 0; i < entries.length; i++) {
+    var date = Utility.parseDate(entries[i].date)
     var yearWeek = Utility.getWeekNumber(Utility.parseDate(entries[i].date))
-    if (yearWeek[0] == new Date().getFullYear()) {
-      weekSum[yearWeek[1]] -= entries[i].amountInBaseCurrency
+    if (yearWeek[0] == new Date().getFullYear() && date < new Date() )  {
+      weekSum[yearWeek[1]-1] -= entries[i].amountInBaseCurrency
       /*console.log(entries[i].amountInBaseCurrency)*/
     }
   }
@@ -95,6 +96,7 @@ function accWeek(data) { // 1 Array of arrays of entries
 
 function accYTD(weekSum) {
   var accYTD = Utility.weekZerosArray()
+  console.log(accYTD)
   var sum = 0
   for (var i = 0; i < weekSum.length; i++) {
     sum += weekSum[i]
@@ -107,6 +109,7 @@ function accYTD(weekSum) {
 class Utility {
   static weekZerosArray() {
       var currentWeek = Utility.getWeekNumber(new Date())[1]
+      console.log(currentWeek);
       return new Array(currentWeek).fill(0)
     }
     // parse a date in yyyy-mm-dd format
@@ -148,6 +151,7 @@ function chartOptions(data) {
   options.xAxis[0].categories = weekNumbers
   options.series[0].data = weekSum
   options.series[2].data = accSum
+  console.log(accSum)
   return options
 }
 
@@ -188,7 +192,7 @@ var defaultOptions = {
   }, {
     name: 'Budget',
     type: 'column',
-    data: [37756, 37756, 37756, 37756, 37756, 37756, 37756, 37756, 37756],
+    data: [37756, 37756, 37756, 37756, 37756, 37756, 37756, 37756, 37756, 37756, 37756, 37756, 37756],
     tooltip: { valueSuffix: ' DKK' }
   }, {
     name: 'Acc. sale',
@@ -200,7 +204,7 @@ var defaultOptions = {
     name: 'Acc, budget',
     type: 'spline',
     // yAxis: 1,
-    data: [37756, 37756 * 2, 37756 * 3, 37756 * 4, 37756 * 5, 37756 * 6, 37756 * 7, 37756 * 8, 37756 * 9],
+    data: [37756, 37756 * 2, 37756 * 3, 37756 * 4, 37756 * 5, 37756 * 6, 37756 * 7, 37756 * 8, 37756 * 9, 37756 * 10, 37756 * 11],
     tooltip: { valueSuffix: ' DKK' }
   }]
 }
