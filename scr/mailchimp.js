@@ -16,7 +16,7 @@ function getData(login){
 function getMailchimpLogin(login, parameter) {
   return new Promise((resolve, reject) => {
     $.ajax({
-        url: `https://us5.api.mailchimp.com/3.0/${parameter}`,
+        url: `https://api.vaavud.com/dashboard/mailchimp/${parameter}`,
         xhrFields: {
           withCredentials: true
         },

@@ -12,8 +12,8 @@ function getData(login){
   getAmplitudeLogin(login, "users?m=active&start=20160104&end=" + todaysDate + "&i=7")
   .then(result => {
     console.log(result)
-    var test = keyData(result)
-    console.log(test)
+    console.log(result["data"]["series"][0][0])
+    // var test = keyData(result)
   })
   // var measurementsTotal = getAmplitudeLogin(login, "events?e=Measure::Began&start=20160101&end=20160327")
   // .then(result => {
@@ -36,7 +36,8 @@ function getAmplitudeLogin(login, parameter) {
         headers: {
           "Authorization": "Basic " + btoa(login.APIKey + ":" + login.SecretKey)
         },
-        type: "GET"
+        type: "GET",
+        dataType: "json",
       })
       // .always( resolve ); // resolve is a function that takes one parameter (and passes on this value)
       .always(function(result) {
@@ -46,9 +47,9 @@ function getAmplitudeLogin(login, parameter) {
 }
 
 function keyData(data) {
-  var length = data[0].length
+  var length = data[data][series][0][0].length
   var users = new Array(length)
-  for (var i = 0; i < data[0].length; i++) {
+  for (var i = 0; i < length; i++) {
     var users = data[0][i]
   }
   console.log(users)
