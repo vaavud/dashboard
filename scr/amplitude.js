@@ -10,10 +10,11 @@ function getData(login){
   console.log(todaysDate)
 
   getAmplitudeLogin(login, "users?m=active&start=20160104&end=" + todaysDate + "&i=7")
-  .then(result => {
-    console.log(result)
-    console.log(result["data"]["series"][0][0])
-    // var test = keyData(result)
+  .then(data => {
+    var activeUsers = data["data"]["series"][0]
+    console.log(data["data"]["series"][0])
+
+    return {"activeUsers": activeUsers}
   })
   // var measurementsTotal = getAmplitudeLogin(login, "events?e=Measure::Began&start=20160101&end=20160327")
   // .then(result => {
@@ -46,36 +47,32 @@ function getAmplitudeLogin(login, parameter) {
   })
 }
 
-function keyData(data) {
-  var length = data[data][series][0][0].length
-  var users = new Array(length)
-  for (var i = 0; i < length; i++) {
-    var users = data[0][i]
-  }
-  console.log(users)
-  return users
-}
+// function keyData(data) {
+//   var users = new Array(data.length)
+//   for (var i = 0; i < data.length; i++) {
+//     users[i] = data[i]
+//   }
+//   console.log(users)
+//   return users
+// }
 
 function chartOptions(data) {
-  var weekSum = data.week
-
+  var activeUsers = data.activeUsers
   var options = chart
-
   var weekNumbers = []
-  for (var i = 0; i < weekSum.length; i++) {
+  for (var i = 0; i < data.length; i++) {
     weekNumbers[i] = i + 1
   }
 
   options.xAxis[0].categories = weekNumbers
-  options.series[0].data = weekSum
-
+  options.series[0].data = activeUsers
   return options
 }
 
 var chart = {
   chart: { zoomType: 'xy' },
   title: { text: 'Active users 2016' },
-  subtitle: { text: 'Source: amplitude' },
+  subtitle: { text: 'Source: amplitude.com' },
   xAxis: [{
     title: { text: "Week no." },
     categories: [],
@@ -100,7 +97,7 @@ var chart = {
     backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
   },
   series: [{
-    name: 'Invoiced sale',
+    name: 'Active users',
     type: 'column',
     data: [],
     tooltip: {
@@ -110,6 +107,6 @@ var chart = {
 }
 
 module.exports = {
-  getData: getData
-  // chartOptions: chartOptions
+  getData: getData,
+  chartOptions: chartOptions
 }

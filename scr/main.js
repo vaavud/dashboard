@@ -52,23 +52,24 @@ function get3PartyDetails() {
     console.log(`data loaded! ${Object.keys(snap.val()).length}`);
     var economicData = Economic.getData(snap.val()["E-conomic"]);
     economicData.then(data => {
-      var options = Economic.chartOptions(data)
-      new Highcharts.chart('container1', options)
-      new Highcharts.chart('container2', options)
-      new Highcharts.chart('container3', options)
-      new Highcharts.chart('container4', options)
-      new Highcharts.chart('container5', options)
-      new Highcharts.chart('container6', options)
+      var data1 = Economic.chartOptions(data)
+      new Highcharts.chart('container1', data1)
+      // new Highcharts.chart('container3', data1)
+      // new Highcharts.chart('container4', data1)
+      // new Highcharts.chart('container5', data1)
+      // new Highcharts.chart('container6', data1)
     })
 
     // Amplitude data
     var iOSData = Amplitude.getData(snap.val()["Amplitude-iOS"]);
-    // iOSData.then(data => {
-    //   var options = Amplitude.chartOptions(data)
-    //var androidData = Amplitude.getData(snap.val()["Amplitude-Android"]);
+    iOSData.then(data => {
+      var data2 = Amplitude.chartOptions(data)
+      new Highcharts.chart('container2', data2)
+        //var androidData = Amplitude.getData(snap.val()["Amplitude-Android"]);
 
-    // Mailchimp data
-    var mailchimp = Mailchimp.getData(snap.val()["Mailchimp"]);
-    // something get other data here
-  });
+      // Mailchimp data
+      // var mailchimp = Mailchimp.getData(snap.val()["Mailchimp"]);
+      // something get other data here
+    });
+  })
 }
