@@ -14,6 +14,7 @@ function getData(login){
   .then(data => {
     var weekSum = accWeek(data)
     var accSum = accYTD(weekSum)
+    console.log(weekSum)
 
     return {"week": weekSum, "acc": accSum}
   })
@@ -61,7 +62,6 @@ function getEconomicAccount(login, account) {
               resolve(endResult)
             })
         }
-
         resolve(result)
       })
   })
@@ -163,15 +163,19 @@ var chart = {
   title: { text: 'Sales 2016' },
   subtitle: { text: 'Source: e-conomic.dk' },
   xAxis: [{
-    title: { text: "Week no." },
+    labels: { style: { color: '#000000' } },
+    title: {
+      text: "Week no.",
+      style: {color: '#000000'}
+     },
     categories: [],
     crosshair: true
   }],
   yAxis: [{ // Primary yAxis
-      labels: { style: { color: Highcharts.getOptions().colors[1] } },
+      labels: { style: { color: '#000000' } },
       title: {
         text: 'Amount (DKK)',
-        style: { color: Highcharts.getOptions().colors[1] }
+        style: { color: '#000000' }
       }
     }
   ],
@@ -186,7 +190,7 @@ var chart = {
     backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
   },
   series: [{
-    name: 'Invoiced sale',
+    name: 'Actual sale',
     type: 'column',
     data: [],
     tooltip: {
@@ -204,7 +208,7 @@ var chart = {
     data: [],
     tooltip: { valueSuffix: ' DKK' }
   }, {
-    name: 'Acc, budget',
+    name: 'Acc. budget',
     type: 'spline',
     // yAxis: 1,
     data: [],

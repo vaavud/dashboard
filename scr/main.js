@@ -7,6 +7,11 @@ var Economic = require('./economic.js')
 var Amplitude = require('./amplitude.js')
 var Mailchimp = require('./mailchimp.js')
 
+/* Vaavud colors */
+new Highcharts.setOptions({
+  colors: ['#cb2c30', '#00a3e0']
+})
+
 /*
 Login to firebase
 */
@@ -53,6 +58,7 @@ function get3PartyDetails() {
     var economicData = Economic.getData(snap.val()["E-conomic"]);
     economicData.then(data => {
       var data1 = Economic.chartOptions(data)
+
       new Highcharts.chart('container1', data1)
       // new Highcharts.chart('container3', data1)
       // new Highcharts.chart('container4', data1)
@@ -63,13 +69,14 @@ function get3PartyDetails() {
     // Amplitude data
     var iOSData = Amplitude.getData(snap.val()["Amplitude-iOS"]);
     iOSData.then(data => {
-      var data2 = Amplitude.chartOptions(data)
+    // console.log(iOSData) // UNDEFINED????
+      var data2 = Amplitude.chartOptions(iOSData)
       new Highcharts.chart('container2', data2)
         //var androidData = Amplitude.getData(snap.val()["Amplitude-Android"]);
-
-      // Mailchimp data
-      // var mailchimp = Mailchimp.getData(snap.val()["Mailchimp"]);
-      // something get other data here
     });
+      // Mailchimp data
+    var mailchimp = Mailchimp.getData(snap.val()["Mailchimp"]);
+      // something get other data here
+
   })
 }
