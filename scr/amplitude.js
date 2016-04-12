@@ -5,24 +5,24 @@ var Highcharts = require('highcharts')
 Retrieve Amplitude data
 */
 function getData(login){
-  var todayOj = new Date()
-  var todaysDate = todayOj.toISOString().slice(0,10).replace(/-/g, "")
-  console.log(todaysDate)
+  return new Promise((resolve,reject) => {
+    var todayOj = new Date()
+    var todaysDate = todayOj.toISOString().slice(0,10).replace(/-/g, "")
+    console.log(todaysDate)
 
-  // var aUsers = getAmplitudeLogin(login, "users?m=active&start=20160104&end=" + todaysDate + "&i=7")
-  // // var measurementsTotal = getAmplitudeLogin(login, "events?e=Measure::Began&start=20160104&end=" + todaysDate + "&i=7")
-  //
-  // return Promise.all(aUsers, measurementsTotal)
-  // .then(data => {
-  //   var activeUsers = data["data"]["series"][0]
-  //   var measurements = data
+    // var aUsers = getAmplitudeLogin(login, "users?m=active&start=20160104&end=" + todaysDate + "&i=7")
+    // // var measurementsTotal = getAmplitudeLogin(login, "events?e=Measure::Began&start=20160104&end=" + todaysDate + "&i=7")
+    //
+    // return Promise.all(aUsers, measurementsTotal)
+    // .then(data => {
+    //   var activeUsers = data["data"]["series"][0]
+    //   var measurements = data
 
-  getAmplitudeLogin(login, "users?m=active&start=20160104&end=" + todaysDate + "&i=7")
-  .then(data => {
-    var activeUsers = data["data"]["series"][0]
-    console.log(activeUsers)
-
-    return activeUsers
+    getAmplitudeLogin(login, "users?m=active&start=20160104&end=" + todaysDate + "&i=7").then(data => {
+      var activeUsers = data["data"]["series"][0]
+      // console.log('ActiveUsers',activeUsers)
+      resolve(activeUsers)
+    })
   })
   // var measurementsTotal = getAmplitudeLogin(login, "events?e=Measure::Began&start=20160101&end=20160327")
   // .then(result => {
@@ -65,7 +65,8 @@ function getAmplitudeLogin(login, parameter) {
 // }
 
 function chartOptions(data) {
-  var activeUsers = data.activeUsers
+  console.log('charts', data) //UNDEFINED!
+  var activeUsers = data
   var options = chart
   var weekNumbers = []
   for (var i = 0; i < data.length; i++) {

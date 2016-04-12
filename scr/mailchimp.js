@@ -4,20 +4,21 @@ var $ = require('jquery')
 Retrieve Mailchimp data
 */
 function getData(login){
+  return new Promise((resolve,reject) => {
+    getMailchimpLogin(login, "reports/f5270671d1")
+    .then(data => {
 
-  getMailchimpLogin(login, "reports/f5270671d1")
-  .then(data => {
-
-    var title = data["campaign_title"]
+      var title = data["campaign_title"]
       console.log(title)
-    var emailsSent = data["emails_sent"]
-    console.log(emailsSent)
-    var openRate = parseFloat(data["opens"]["open_rate"]).toFixed(2)*100 + " %";
-    console.log(openRate)
-    var clickRate = parseFloat(data["clicks"]["click_rate"]).toFixed(2)*100 + " %";
-    console.log(clickRate)
+      var emailsSent = data["emails_sent"]
+      console.log(emailsSent)
+      var openRate = parseFloat(data["opens"]["open_rate"]).toFixed(2)*100 + " %";
+      console.log(openRate)
+      var clickRate = parseFloat(data["clicks"]["click_rate"]).toFixed(2)*100 + " %";
+      console.log(clickRate)
+    })
+    resolve()
   })
-
 }
 
 

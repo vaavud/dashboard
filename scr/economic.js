@@ -14,7 +14,6 @@ function getData(login){
   .then(data => {
     var weekSum = accWeek(data)
     var accSum = accYTD(weekSum)
-    console.log(weekSum)
 
     return {"week": weekSum, "acc": accSum}
   })
