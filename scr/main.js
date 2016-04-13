@@ -61,24 +61,33 @@ function get3PartyDetails() {
 
       new Highcharts.chart('container1', data1)
 
-      // new Highcharts.chart('container4', data1)
       // new Highcharts.chart('container5', data1)
       // new Highcharts.chart('container6', data1)
     })
 
     // Amplitude data
-    // console.log('snap:',snap.val()["Amplitude-iOS"])
-    var iosAmplitude = Amplitude.getData(snap.val()["Amplitude-iOS"])
-    iosAmplitude.then(data => {
-      var data2 = Amplitude.chartOptions(data)
+    var activeUsers = Amplitude.getData(snap.val()["Amplitude-iOS"], snap.val()["Amplitude-Android"], "ActiveUsers");
+    activeUsers.then(data => {
+      var data2 = Amplitude.chartOptions(data, "Active users")
       new Highcharts.chart('container2', data2)
-        //var androidData = Amplitude.getData(snap.val()["Amplitude-Android"]);
     })
+    var downloads = Amplitude.getData(snap.val()["Amplitude-iOS"], snap.val()["Amplitude-Android"], "Downloads");
+    downloads.then(data => {
+      var data3 = Amplitude.chartOptions(data, "Downloads")
+      new Highcharts.chart('container3', data3)
+    })
+    var measurements = Amplitude.getData(snap.val()["Amplitude-iOS"], snap.val()["Amplitude-Android"], "Measurements");
+    measurements.then(data => {
+      var data3 = Amplitude.chartOptions(data, "Measurements")
+      new Highcharts.chart('container3', data3)
+    })
+
+
       // Mailchimp data
-    var mailchimp = Mailchimp.getData(snap.val()["Mailchimp"])
+    var mailchimp = Mailchimp.getData(snap.val()["Mailchimp"]);
     // mailchimp.then(data => {
-    //   'container3', data)
-    })
+    //   'container3', data
+    // })
       // something get other data here
 
   })
