@@ -1,36 +1,63 @@
 var $ = require('jquery')
 var Highcharts = require('highcharts')
-
+var displayDays = 28;
 /*
 Retrieve Amplitude data
 */
 function getData(iOSlogin, androidLogin, plot){
   var todayOj = new Date()
   var todaysDate = todayOj.toISOString().slice(0,10).replace(/-/g, "")
-  console.log(todaysDate)
+  var fourWeeksAgo = new Date(new Date().setDate(new Date().getDate()-27))
+  var startDate = fourWeeksAgo.toISOString().slice(0,10).replace(/-/g, "")
+  var lastMonth = new Date(new Date().setDate(new Date().getDate()-(27*2+1)))
+  var lastMonthStart = lastMonth.toISOString().slice(0,10).replace(/-/g, "")
+  var lastMonthE = new Date(new Date().setDate(new Date().getDate()-28))
+  var lastMonthEnd = lastMonthE.toISOString().slice(0,10).replace(/-/g, "")
 
-// Active Users - Defined as App::Open event in Amplitude
-if (plot == "ActiveUsers") {
-  var iOS = getAmplitudeLogin(iOSlogin, "events?e=App::Open&start=20160104&end=" + todaysDate + "&i=7")
-  var android = getAmplitudeLogin(androidLogin, "events?e=App::Open&start=20160104&end=" + todaysDate + "&i=7")
-}
-// Downloads - Defined as New users in Amplitude
-if (plot == "Downloads") {
-  var iOS = getAmplitudeLogin(iOSlogin, "users?m=new&start=20160104&end=" + todaysDate + "&i=7")
-  var android = getAmplitudeLogin(androidLogin, "users?m=new&start=20160104&end=" + todaysDate + "&i=7")
-}
-// Measurements - Defined as Measure::Began event in Amplitude
-if (plot == "Measurements") {
-  var iOS = getAmplitudeLogin(iOSlogin, "events?e=Measure::Began&start=20160104&end=" + todaysDate + "&i=7")
-  var android = getAmplitudeLogin(androidLogin, "events?e=Measure::Began&start=20160104&end=" + todaysDate + "&i=7")
-}
+  console.log("today " + todaysDate)
+  console.log("startDate " + startDate)
+  console.log("lastMonthStart: " + lastMonthStart)
+  console.log("lastMonthEnd: " + lastMonthEnd)
 
-  return Promise.all([iOS, android])
+  // Measurements - Defined as Measure::Began event in Amplitude
+  if (plot == "Measurements") {
+    var iOS = getAmplitudeLogin(iOSlogin, "events?e=Measure::Began&start=" + startDate + "&end=" + todaysDate + "&i=1")
+    var android = getAmplitudeLogin(androidLogin, "events?e=Measurement::Began&start=" + startDate + "&end=" + todaysDate + "&i=1")
+
+    var iOSLM = getAmplitudeLogin(iOSlogin, "events?e=Measure::Began&start=" + lastMonthStart + "&end=" + lastMonthEnd + "&i=1")
+    var androidLM = getAmplitudeLogin(androidLogin, "events?e=Measurement::Began&start=" + lastMonthStart + "&end=" + lastMonthEnd + "&i=1")
+
+  }
+  // Active Users - Defined as unique App::Open event in Amplitude
+  if (plot == "ActiveUsers") {
+    var iOS = getAmplitudeLogin(iOSlogin, "events?e=App::Open&start=" + startDate + "&end=" + todaysDate + "&i=1&m=uniques")
+    var android = getAmplitudeLogin(androidLogin, "events?e=App::Open&start=" + startDate + "&end=" + todaysDate + "&i=1&m=uniques")
+
+    var iOSLM = getAmplitudeLogin(iOSlogin, "events?e=App::Open&start=" + lastMonthStart + "&end=" + lastMonthEnd + "&i=1&m=uniques")
+    var androidLM = getAmplitudeLogin(androidLogin, "events?e=App::Open&start=" + lastMonthStart + "&end=" + lastMonthEnd + "&i=1&m=uniques")
+  }
+  // Downloads - Defined as New users in Amplitude
+  if (plot == "Downloads") {
+    var iOS = getAmplitudeLogin(iOSlogin, "users?m=new&start=" + startDate + "&end=" + todaysDate + "&i=1")
+    var android = getAmplitudeLogin(androidLogin, "users?m=new&start=" + startDate + "&end=" + todaysDate + "&i=1")
+
+    var iOSLM = getAmplitudeLogin(iOSlogin, "users?m=new&start=" + lastMonthStart + "&end=" + lastMonthEnd + "&i=1")
+    var androidLM = getAmplitudeLogin(androidLogin, "users?m=new&start=" + lastMonthStart + "&end=" + lastMonthEnd + "&i=1")
+  }
+  // Notifications - Defined as Notifications::added event in Amplitude
+  if (plot == "Notifications added") {
+    var iOS = getAmplitudeLogin(iOSlogin, "events?e=Notifications::added&start=" + startDate + "&end=" + todaysDate + "&i=1")
+    var android = getAmplitudeLogin(androidLogin, "events?e=Notifications::Added&start=" + startDate + "&end=" + todaysDate + "&i=1")
+
+    var iOSLM = getAmplitudeLogin(iOSlogin, "events?e=Notifications::added&start=" + lastMonthStart + "&end=" + lastMonthEnd + "&i=1")
+    var androidLM = getAmplitudeLogin(androidLogin, "events?e=Notifications::Added&start=" + lastMonthStart + "&end=" + lastMonthEnd + "&i=1")
+  }
+
+  return Promise.all([iOS, android, iOSLM, androidLM])
   .then(data => {
     var userData = combinedData(data)
     return {"userData": userData}
   })
-
 }
     // var aUsers = getAmplitudeLogin(login, "users?m=active&start=20160104&end=" + todaysDate + "&i=7")
     // // var measurementsTotal = getAmplitudeLogin(login, "events?e=Measure::Began&start=20160104&end=" + todaysDate + "&i=7")
@@ -75,49 +102,33 @@ function getAmplitudeLogin(login, parameter) {
   })
 }
 
-function combinedData(data) { // 1 Array of arrays of entries
-  var combined = Utility.weekZerosArray()
-  for (var i = 0; i < data.length; i++) {
+function combinedData(data) { // 1 Array of arrays of data
+  var combined = new Array(displayDays).fill(0)
+  var combinedLM = new Array(displayDays).fill(0)
+  for (var i = 0; i < 2; i++) {
     var s = data[i]["data"]["series"][0]
+    var t = data[i+2]["data"]["series"][0]
     for (var j = 0; j < s.length; j++) {
       combined[j] += s[j]
+      combinedLM[j] += t[j]
     }
   }
-  return combined
-}
-
-class Utility {
-  static weekZerosArray() {
-      var currentWeek = Utility.getWeekNumber(new Date())[1]
-      return new Array(currentWeek).fill(0)
-    }
-
-  static getWeekNumber(d) {
-    // Copy date so don't modify original
-    d = new Date(+d);
-    d.setHours(0, 0, 0);
-    // Set to nearest Thursday: current date + 4 - current day number
-    // Make Sunday's day number 7
-    d.setDate(d.getDate() + 4 - (d.getDay() || 7));
-    // Get first day of year
-    var yearStart = new Date(d.getFullYear(), 0, 1);
-    // Calculate full weeks to nearest Thursday
-    var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-    // Return array of year and week number
-    return [d.getFullYear(), weekNo];
-  }
+  return {"combined": combined, "combinedLM": combinedLM}
 }
 
 function chartOptions(data, title) {
   var options = chart
 
-  var weekNumbers = []
-  for (var i = 0; i < data.length; i++) {
-    weekNumbers[i] = i + 1
+  var dates = []
+  for (var i = 0; i < displayDays; i++) {
+    var xDaysAgo = new Date(new Date().setDate(new Date().getDate()-27+i))
+    dates[i] = xDaysAgo.toDateString().slice(0,10)
   }
+
   options.title.text = title
-  options.xAxis[0].categories = weekNumbers
-  options.series[0].data = data.userData
+  options.xAxis[0].categories = dates
+  options.series[0].data = data.userData.combined
+  options.series[1].data = data.userData.combinedLM
   return options
 }
 
@@ -126,7 +137,7 @@ var chart = {
   title: { text: '' },
   subtitle: { text: 'Source: amplitude.com' },
   xAxis: [{
-    title: { text: "Week no." },
+    title: { text: "Date" },
     categories: [],
     crosshair: true
   }],
@@ -153,7 +164,14 @@ var chart = {
     type: 'column',
     data: [],
     tooltip: {
-      valueSuffix: ' DKK'
+      valueSuffix: ' users'
+    }
+  }, {
+    name: 'Last month',
+    type: 'column',
+    data: [],
+    tooltip: {
+      valueSuffix: ' users'
     }
   }]
 }

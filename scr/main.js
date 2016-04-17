@@ -54,41 +54,42 @@ Retrive login credentials from firebase to 3Party Services
 
 function get3PartyDetails() {
   ref.child('/').once("value", function(snap) {
+    // E-conomic data
     console.log(`data loaded! ${Object.keys(snap.val()).length}`);
-    var economicData = Economic.getData(snap.val()["E-conomic"]);
-    economicData.then(data => {
-      var data1 = Economic.chartOptions(data)
-
-      new Highcharts.chart('container1', data1)
-
-      // new Highcharts.chart('container5', data1)
-      // new Highcharts.chart('container6', data1)
-    })
+    // var economicData = Economic.getData(snap.val()["E-conomic"]);
+    // economicData.then(data => {
+    //   var data1 = Economic.chartOptions(data)
+    //   new Highcharts.chart('container1', data1)
+    // })
 
     // Amplitude data
-    var activeUsers = Amplitude.getData(snap.val()["Amplitude-iOS"], snap.val()["Amplitude-Android"], "ActiveUsers");
-    activeUsers.then(data => {
-      var data2 = Amplitude.chartOptions(data, "Active users")
-      new Highcharts.chart('container2', data2)
-    })
-    var downloads = Amplitude.getData(snap.val()["Amplitude-iOS"], snap.val()["Amplitude-Android"], "Downloads");
-    downloads.then(data => {
-      var data3 = Amplitude.chartOptions(data, "Downloads")
-      new Highcharts.chart('container3', data3)
-    })
-    var measurements = Amplitude.getData(snap.val()["Amplitude-iOS"], snap.val()["Amplitude-Android"], "Measurements");
-    measurements.then(data => {
-      var data3 = Amplitude.chartOptions(data, "Measurements")
-      new Highcharts.chart('container3', data3)
-    })
-
+    // var activeUsers = Amplitude.getData(snap.val()["Amplitude-iOS"], snap.val()["Amplitude-Android"], "ActiveUsers");
+    // activeUsers.then(data => {
+    //   var data2 = Amplitude.chartOptions(data, "Active users")
+    //   new Highcharts.chart('container2', data2)
+    // })
+    // var measurements = Amplitude.getData(snap.val()["Amplitude-iOS"], snap.val()["Amplitude-Android"], "Measurements");
+    // measurements.then(data => {
+    //   var data3 = Amplitude.chartOptions(data, "Measurements")
+    //   new Highcharts.chart('container3', data3)
+    // })
+    // var downloads = Amplitude.getData(snap.val()["Amplitude-iOS"], snap.val()["Amplitude-Android"], "Downloads");
+    // downloads.then(data => {
+    //   var data4 = Amplitude.chartOptions(data, "Downloads")
+    //   new Highcharts.chart('container4', data4)
+    // })
+    // var notifications = Amplitude.getData(snap.val()["Amplitude-iOS"], snap.val()["Amplitude-Android"], "Notifications added");
+    // notifications.then(data => {
+    //   var data5 = Amplitude.chartOptions(data, "Notifications added")
+    //   new Highcharts.chart('container5', data5)
+    // })
 
       // Mailchimp data
     var mailchimp = Mailchimp.getData(snap.val()["Mailchimp"]);
-    // mailchimp.then(data => {
-    //   'container3', data
-    // })
+    mailchimp.then(data => {
+      var data6 = Mailchimp.chartOptions(data)
+      new Highcharts.chart('container6', data6)
+    })
       // something get other data here
-
   })
 }

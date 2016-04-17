@@ -1,5 +1,13 @@
 var $ = require('jquery')
 var Highcharts = require('highcharts')
+
+// Current accounting year
+var year = new Date().getFullYear()
+var startDate = new Date(new Date().setDate(new Date().getDate()-30))
+console.log("startDate", startDate)
+var todaysDate = new Date()
+var _MS_PER_DAY = 1000*60*60*24;
+
 /*
 Retrive e-conomic data
 */
@@ -12,9 +20,10 @@ function getData(login){
 
   return Promise.all([p1021, p1022, p1023, p1032, p1033])
   .then(data => {
-    var weekSum = accWeek(data)
-    var accSum = accYTD(weekSum)
-    return {"week": weekSum, "acc": accSum}
+    // var weekSum = accWeek(data)
+    var daySum = accDay(data)
+    var accSum = accPeriod(daySum)
+    return {"daySum": daySum, "accSum": accSum}
   })
 }
 
@@ -22,7 +31,7 @@ function getData(login){
 function getEconomicAccountPage(login, account, page) {
   return new Promise((resolve, reject) => {
     $.ajax({
-        url: `https://restapi.e-conomic.com/ACCOUNTS/${account}/ACCOUNTING-YEARS/2016/entries?skippages=${page}&pagesize=1000`,
+        url: `https://restapi.e-conomic.com/ACCOUNTS/${account}/ACCOUNTING-YEARS/`+ year + `/entries?skippages=${page}&pagesize=1000`,
         dataType: "json",
         headers: {
           "X-AppSecretToken": login.AppSecretToken,
@@ -67,40 +76,79 @@ function getEconomicAccount(login, account) {
 }
 
 /* Data manipulation */
-
-function sumWeeks(entries) {
-  var weekSum = Utility.weekZerosArray()
+// function sumWeeks(entries) {
+//   var weekSum = Utility.weekZerosArray() // array with 15 spaces
+//   for (var i = 0; i < entries.length; i++) { // entries.lenght is all entries on that account
+//     var date = Utility.parseDate(entries[i].date) //the date of the entry eg. Fri Jan 01 2016 Timestamp+Timezone
+//     var yearWeek = Utility.getWeekNumber(Utility.parseDate(entries[i].date)) // array with year and week no
+//     if (yearWeek[0] == new Date().getFullYear() && date < new Date() )  {
+//       // hvis entry er samme år som nuværende år og tidligere end idag
+//       weekSum[yearWeek[1]-1] -= entries[i].amountInBaseCurrency
+//       /*console.log(entries[i].amountInBaseCurrency)*/
+//     }
+//   }
+//   console.log(weekSum)
+//   return weekSum
+// }
+function sumDays(entries) {
+  var daySum = new Array(31).fill(0)
+  var actualYTD = 0;
   for (var i = 0; i < entries.length; i++) {
     var date = Utility.parseDate(entries[i].date)
-    var yearWeek = Utility.getWeekNumber(Utility.parseDate(entries[i].date))
-    if (yearWeek[0] == new Date().getFullYear() && date < new Date() )  {
-      weekSum[yearWeek[1]-1] -= entries[i].amountInBaseCurrency
-      /*console.log(entries[i].amountInBaseCurrency)*/
+    actualYTD -= entries[i].amountInBaseCurrency
+    if (+startDate <= +date && +date <= +todaysDate)  {
+      var utc1 = Date.UTC(startDate.getFullYear(), startDate.getMonth(), startDate.getDate())
+      var utc2 = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
+      var diff = Math.floor((utc2 - utc1)/_MS_PER_DAY)
+      daySum[diff] -= entries[i].amountInBaseCurrency
     }
   }
-  return weekSum
+  console.log("actualYTD", actualYTD)
+  return {"daySum": daySum, "actualYTD": actualYTD}
 }
 
-function accWeek(data) { // 1 Array of arrays of entries
-  var accWeekSum = Utility.weekZerosArray()
-  for (var i = 0; i < data.length; i++) {
-    var s = sumWeeks(data[i])
-    for (var j = 0; j < s.length; j++) {
-      accWeekSum[j] += Math.round(s[j])
+// function accWeek(data) { // 1 Array of arrays of entries
+//   var accWeekSum = Utility.weekZerosArray() //15
+//   for (var i = 0; i < data.length; i++) { // data length = 5 arrays
+//     var s = sumWeeks(data[i]) // Forwarding the 1st array of entries
+//     for (var j = 0; j < s.length; j++) {
+//       accWeekSum[j] += Math.round(s[j])
+//     }
+//   }
+//   return accWeekSum
+// }
+// Returns an array for each day the last month and actual sales
+function accDay(data) { // 1 Array of arrays of entries
+  var accDaySum = new Array(31).fill(0)
+  var ytd = 0;
+  for (var i = 0; i < data.length; i++) { // for hvert array (5 totalt)
+    var s = sumDays(data[i]) // daySum = array af dagene med salget pr. dag
+    ytd += Math.round(s.actualYTD)
+    for (var j = 0; j < s.daySum.length; j++) {
+      accDaySum[j] += Math.round(s.daySum[j])
     }
   }
-  return accWeekSum
+  return {"accDaySum": accDaySum, "ytd": ytd}
 }
 
-function accYTD(weekSum) {
-  var accYTD = Utility.weekZerosArray()
+// function accYTD(weekSum) {
+//   var accYTD = Utility.weekZerosArray()
+//   var sum = 0
+//   for (var i = 0; i < weekSum.length; i++) {
+//     sum += weekSum[i]
+//     accYTD[i] += sum
+//   }
+//   return accYTD
+// }
+
+function accPeriod(daySum) {
+  var accPeriod = new Array(31).fill(0)
   var sum = 0
-  for (var i = 0; i < weekSum.length; i++) {
-    sum += weekSum[i]
-    accYTD[i] += sum
-
+  for (var i = 0; i < daySum.accDaySum.length; i++) {
+    sum += daySum.accDaySum[i]
+    accPeriod[i] += sum
   }
-  return accYTD
+  return accPeriod
 }
 
 class Utility {
@@ -136,20 +184,27 @@ class Utility {
 /* Plotting */
 
 function chartOptions(data) {
-  var weekSum = data.week
-  var accSum = data.acc
+  var daySum = data.daySum.accDaySum
+  var accSum = data.accSum
   var options = chart
   var budget = []
   var accBudget = []
-  var weekNumbers = []
-  for (var i = 0; i < weekSum.length; i++) {
-    weekNumbers[i] = i + 1
-    budget[i] = 37756
-    accBudget[i] = 37756*(i+1)
+  var actualYTD = data.daySum.ytd /// PRINT SOMEWHERE!!!
+  console.log(actualYTD)
+  // for (var i = 0; i < weekSum.length; i++) {
+  //   weekNumbers[i] = i + 1
+  //   budget[i] = 37756
+  //   accBudget[i] = 37756*(i+1)
+  // }
+  var dates = []
+  for (var i = 0; i < data.daySum.accDaySum.length; i++) {
+    var date = new Date(new Date().setDate(new Date().getDate()-30+i))
+    dates[i] = date.toDateString().slice(0,10)
+    budget[i] = Math.round(37756/31)
+    accBudget[i] = Math.round((151024/31)*(i+1))
   }
-
-  options.xAxis[0].categories = weekNumbers
-  options.series[0].data = weekSum
+  options.xAxis[0].categories = dates
+  options.series[0].data = daySum
   options.series[1].data = budget
   options.series[2].data = accSum
   options.series[3].data = accBudget
