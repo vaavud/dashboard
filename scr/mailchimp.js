@@ -2,11 +2,13 @@ var $ = require('jquery')
 var Highcharts = require('highcharts')
 
 /*
-Retrieve Mailchimp data - included the 10 newest reports
+Retrieve Mailchimp data - included the 10 newest campaigns
 */
 function getData(login){
   return new Promise((resolve,reject) => {
-    getMailchimpLogin(login, "reports?offset=0&count=1000")
+    // getMailchimpLogin(login, "campaigns?offset=0&count=1000")
+    // A lot easier if sorting worked!
+    getMailchimpLogin(login, "campaigns?offset=0&count=1000")
     .then(function(data) {
       var stats = report(data)
     resolve(stats)
@@ -40,13 +42,40 @@ function report(data){
   var title = new Array(10).fill(0)
   var openRate = new Array(10).fill(0)
   var clickRate = new Array(10).fill(0)
-  for (var i = 0; i < 10; i++) {
-    sentTo[i] = data["reports"][i]["emails_sent"]
-    title[i] = data["reports"][i]["campaign_title"]
-    openRate[i] = parseFloat(data["reports"][i]["opens"]["open_rate"]).toFixed(2)*100
-    clickRate[i] = parseFloat(data["reports"][i]["clicks"]["click_rate"]).toFixed(2)*100
+  // var maxOpenRate = maxOpen(data)
+  var length = data["campaigns"].length
+  var arrayFull = 0
+  for (var i = 0; arrayFull < 10; i++) {
+    var j = length-1-i
+    // Exclude BoD material id = 5a0bd8131f & small campaigns email_sent < 20
+    if (data["campaigns"][j]["status"] == "sent" && data["campaigns"][j]["recipients"]["list_id"] != "5a0bd8131f" && data["campaigns"][j]["emails_sent"] > 20) {
+    sentTo[i] = data["campaigns"][j]["emails_sent"]
+    title[i] = data["campaigns"][j]["settings"]["title"]
+    id = data["campaigns"][j]["id"]
+    console.log(id)
+    openRate[i] = parseFloat(data["campaigns"][j]["report_summary"]["open_rate"]).toFixed(2)*100
+    clickRate[i] = parseFloat(data["campaigns"][j]["report_summary"]["click_rate"]).toFixed(2)*100
+    arrayFull++
   }
+}
+  console.log(openRate)
 return {"sentTo": sentTo, "title": title, "openRate": openRate, "clickRate": clickRate}
+}
+
+// Need some way to exclude BoD material
+function maxOpen(data){
+  var max = 0
+  var maxOpenTitle
+  var id
+  for (var i = 0; i < data["campaigns"].length; i++) {
+    if (max < data["campaigns"][i]["report_summary"]["open_rate"]) {
+      max = data["campaigns"][i]["report_summary"]["open_rate"]
+      maxOpenTitle = data["campaigns"][i]["settings"]["title"]
+      id = data["campaigns"][i]["id"]
+    }
+  }
+  console.log("title: " + maxOpenTitle + ", id:" + id)
+  return {"max": max, "maxOpenTitle": maxOpenTitle}
 }
 
 /* Plotting */
@@ -72,7 +101,7 @@ var chart = {
   xAxis: [{
     categories: [],
     title: {
-      text: {text: null},
+      // text: 'campaigns',
       style: {color: '#000000'}
      },
     crosshair: true
@@ -80,11 +109,17 @@ var chart = {
   yAxis: [{ // Primary yAxis
       labels: { style: { color: '#000000' } },
       title: {
-        text: 'Sent to',
+        text: 'Emails sent',
         style: { color: '#000000' }
       }
-    }
-  ],
+    }, { // Secondary yAxis
+        labels: { format: '{value} %', style: { color: '#000000' } },
+        title: {
+          text: 'Open - & click rate',
+          style: { color: '#000000' }
+        },
+        opposite: true
+      }],
   tooltip: { shared: true },
   legend: {
     layout: 'vertical',
@@ -96,22 +131,22 @@ var chart = {
     backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
   },
   series: [{
-    name: 'Sent to',
+    name: 'Emails sent',
     type: 'column',
     data: [],
-    tooltip: {
-      valueSuffix: ' emails'
-    }
+    // tooltip: {
+    //   valueSuffix: ' emails'
+    // }
   }, {
     name: 'Open rate',
     type: 'spline',
-    // yAxis: 1,
+    yAxis: 1,
     data: [],
     tooltip: { valueSuffix: ' %' }
   }, {
     name: 'Click rate',
     type: 'spline',
-    // yAxis: 1,
+    yAxis: 1,
     data: [],
     tooltip: { valueSuffix: ' %' }
   }]
