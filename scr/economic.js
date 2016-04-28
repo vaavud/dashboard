@@ -103,7 +103,7 @@ function sumDays(entries) {
       daySum[diff] -= entries[i].amountInBaseCurrency
     }
   }
-  console.log("actualYTD", actualYTD)
+  // console.log("actualYTD", actualYTD)
   return {"daySum": daySum, "actualYTD": actualYTD}
 }
 
@@ -190,7 +190,7 @@ function chartOptions(data) {
   var budget = []
   var accBudget = []
   var actualYTD = data.daySum.ytd /// PRINT SOMEWHERE!!!
-  console.log(actualYTD)
+  // console.log(actualYTD)
   // for (var i = 0; i < weekSum.length; i++) {
   //   weekNumbers[i] = i + 1
   //   budget[i] = 37756
@@ -213,8 +213,11 @@ function chartOptions(data) {
 
 var chart = {
   chart: { zoomType: 'xy' },
-  title: { text: 'Sales 2016' },
-  subtitle: { text: 'Source: e-conomic.dk' },
+  title: {
+    text: 'Sales 2016',
+    style: {fontFamily: 'Roboto Black Italic', fontWeight: 'bold'}
+  },
+  // subtitle: { text: 'Source: e-conomic.dk' },
   xAxis: [{
     labels: { style: { color: '#000000' } },
     title: {

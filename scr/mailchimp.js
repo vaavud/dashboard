@@ -42,24 +42,24 @@ function report(data){
   var title = new Array(10).fill(0)
   var openRate = new Array(10).fill(0)
   var clickRate = new Array(10).fill(0)
-  // var maxOpenRate = maxOpen(data)
+  //var maxOpenRate = maxOpen(data)
   var length = data["campaigns"].length
   var arrayFull = 0
   for (var i = 0; arrayFull < 10; i++) {
     var j = length-1-i
     // Exclude BoD material id = 5a0bd8131f & small campaigns email_sent < 20
     if (data["campaigns"][j]["status"] == "sent" && data["campaigns"][j]["recipients"]["list_id"] != "5a0bd8131f" && data["campaigns"][j]["emails_sent"] > 20) {
-    sentTo[i] = data["campaigns"][j]["emails_sent"]
-    title[i] = data["campaigns"][j]["settings"]["title"]
-    id = data["campaigns"][j]["id"]
-    console.log(id)
-    openRate[i] = parseFloat(data["campaigns"][j]["report_summary"]["open_rate"]).toFixed(2)*100
-    clickRate[i] = parseFloat(data["campaigns"][j]["report_summary"]["click_rate"]).toFixed(2)*100
-    arrayFull++
+      sentTo[arrayFull] = data["campaigns"][j]["emails_sent"]
+      title[arrayFull] = data["campaigns"][j]["settings"]["title"]
+      id = data["campaigns"][j]["id"]
+      // console.log(id)
+      openRate[arrayFull] = parseFloat(data["campaigns"][j]["report_summary"]["open_rate"]).toFixed(2)*100
+      clickRate[arrayFull] = parseFloat(data["campaigns"][j]["report_summary"]["click_rate"]).toFixed(2)*100
+      arrayFull++
+    }
   }
-}
-  console.log(openRate)
-return {"sentTo": sentTo, "title": title, "openRate": openRate, "clickRate": clickRate}
+    // console.log(openRate)
+  return {"sentTo": sentTo, "title": title, "openRate": openRate, "clickRate": clickRate}
 }
 
 // Need some way to exclude BoD material
@@ -74,13 +74,13 @@ function maxOpen(data){
       id = data["campaigns"][i]["id"]
     }
   }
-  console.log("title: " + maxOpenTitle + ", id:" + id)
+  // console.log("title: " + maxOpenTitle + ", id:" + id)
   return {"max": max, "maxOpenTitle": maxOpenTitle}
 }
 
 /* Plotting */
 function chartOptions(data) {
-  console.log(data)
+  // console.log(data)
   var sentTo = data.sentTo
   var campaignTitle = data.title
   var openRate = data.openRate
@@ -97,7 +97,7 @@ function chartOptions(data) {
 var chart = {
   chart: { type: 'bar' },
   title: { text: 'Mailchimp campaigns' },
-  subtitle: { text: 'Source: mailchimp.com' },
+  // subtitle: { text: 'Source: mailchimp.com' },
   xAxis: [{
     categories: [],
     title: {
