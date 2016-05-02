@@ -6,6 +6,7 @@ var Highcharts = require('highcharts')
 var Economic = require('./economic.js')
 var Amplitude = require('./amplitude.js')
 var Mailchimp = require('./mailchimp.js')
+var Mixpanel = require('./mixpanel.js')
 
 /* Vaavud colors */
 // Red - Blue
@@ -25,33 +26,63 @@ Login to firebase
 */
 var ref = new Firebase('https://shining-torch-4752.firebaseio.com/');
 $(document).ready(function() {
-  ref.authWithPassword({
-    email: "maria@vaavud.com",
-    password: "1234"
-  }, authHandler);
-})
+        var email = getQueryVariable('email');
+        var password = getQueryVariable('password');
 
-$('#password').keypress(function(e) {
-  if (e.keyCode == 13) {
-    var email = $('#email').val();
-    var password = $('#password').val();
+        // else login manual
+        if (email == false || password == false){
+          $('#password').keypress(function(e) {
+              if (e.keyCode == 13) {
+                var email = $('#email').val();
+                var password = $('#password').val();
 
-    ref.authWithPassword({
-      email: email,
-      password: password
-    }, authHandler);
+                ref.authWithPassword({
+                  email: email,
+                  password: password
+                }, authHandler);
 
-    $('#password').val('');
-  }
+                $('#password').val('');
+            }
+          })
+        }
+        ref.authWithPassword({
+          email: email,
+          password: password
+        }, authHandler);
+
 });
+
+// Read login credentials from URL
+function getQueryVariable(variable) {
+    var query = window.location.search.substring(1)
+    var vars = query.split("&");
+    for (var i = 0; i < vars.length; i++) {
+      var pair = vars[i].split("=");
+      if (pair[0] == variable) {
+        return pair[1];
+      }
+   }
+   return (false);
+ }
+
+// Password automatication
+// ref.authWithPassword({
+//   email: "maria@vaavud.com",
+//   password: "1234"
+// }, authHandler);
+
 
 function authHandler(error, authData) {
   if (error) {
     console.log("Login Failed!", error);
   } else {
+    document.getElementById('login').style.visibility = 'hidden';
     console.log("Authenticated successfully with payload:", authData);
 
     get3PartyDetails()
+
+    // Reload every 15 min (given in miliseconds)
+    // setInterval(get3PartyDetails, 15*1000*60)
   }
 }
 
@@ -65,23 +96,21 @@ function get3PartyDetails() {
     var economicData = Economic.getData(snap.val()["E-conomic"]);
     economicData.then(data => {
       var data1 = Economic.chartOptions(data)
-      new Highcharts.chart('container1', data1)
+      var ytd = Economic.renderer(data)
+      new Highcharts.chart('container1', data1, ytd)
+
+      new Highcharts.chart('container1', data1, function (chart) {
+        console.log('test')
+        chart.renderer.text('test', 140, 100)
+        .add();
+      })
+
     })
 
     // Amplitude data
-    var activeUsers = Amplitude.getData(snap.val()["Amplitude-iOS"], snap.val()["Amplitude-Android"], "ActiveUsers");
-    activeUsers.then(data => {
-      // var lastYear = snap.val()['Mixpanle: Date'];
-      var lastYear = snap.val()['Mixpanel: Open App (unique)'];
-      var data2 = Amplitude.chartOptions(data, "Active users", lastYear)
-      new Highcharts.chart('container2', data2)
-    })
-    var measurements = Amplitude.getData(snap.val()["Amplitude-iOS"], snap.val()["Amplitude-Android"], "Measurements");
-    measurements.then(data => {
-      var lastYear = snap.val()['Mixpanel: Start Measurement (total)'];
-      var data3 = Amplitude.chartOptions(data, "Measurements", lastYear)
-      new Highcharts.chart('container3', data3)
-    })
+    getMeasurements()
+    getActiveUsers()
+
     var downloads = Amplitude.getData(snap.val()["Amplitude-iOS"], snap.val()["Amplitude-Android"], "Downloads");
     downloads.then(data => {
       var data4 = Amplitude.chartOptions(data, "Downloads")
@@ -92,24 +121,46 @@ function get3PartyDetails() {
       var data5 = Amplitude.chartOptions(data, "Notifications added")
       new Highcharts.chart('container5', data5)
     })
-
-      // Mailchimp data
+    //
+    //   // Mailchimp data
     var mailchimp = Mailchimp.getData(snap.val()["Mailchimp"]);
     mailchimp.then(data => {
       var data6 = Mailchimp.chartOptions(data)
       new Highcharts.chart('container6', data6)
     })
+
+    // var mixpanel = Mixpanel.getData(snap.val()["Mixpanel"], "Measurements");
+    // console.log(mixpanel)
       // something get other data here
   })
 }
 
-// Get a database reference to our posts
-// var refs = new Firebase("shining-torch-4752.firebaseIO.com");
-// var testRef = refs.child("0")
-// // Attach an asynchronous callback to read the data at our posts reference
-// refs.on("value", function(snapshot) {
-//   var test = snapshot.val()['Mixpanle: Date'][268];
-//   console.log("Finding a date: " + test);
-// }, function (errorObject) {
-//   console.log("The read failed: " + errorObject.code);
-// });
+function getMeasurements() {
+  ref.child('/').once("value", function(snap) {
+    var mixActiveUsers = Mixpanel.getData(snap.val()["Mixpanel"], "ActiveUsers");
+    var activeUsers = Amplitude.getData(snap.val()["Amplitude-iOS"], snap.val()["Amplitude-Android"], "ActiveUsers");
+    return Promise.all([mixActiveUsers, activeUsers])
+      .then (data => {
+        var amplitudeCMLM = Amplitude.combineAll(data);
+        return {"amplitudeCMLM": amplitudeCMLM}
+      }).then(data => {
+          var data2 = Amplitude.chartOptions(data, "Active users")
+          new Highcharts.chart('container2', data2)
+        })
+    })
+}
+
+function getActiveUsers() {
+  ref.child('/').once("value", function(snap) {
+    var mixMeasurements = Mixpanel.getData(snap.val()["Mixpanel"], "Measurements");
+    var measurements = Amplitude.getData(snap.val()["Amplitude-iOS"], snap.val()["Amplitude-Android"], "Measurements");
+    return Promise.all([mixMeasurements, measurements])
+      .then(data => {
+        var amplitudeCMLM = Amplitude.combineAll(data);
+        return {"amplitudeCMLM": amplitudeCMLM}
+      }).then(data => {
+          var data3 = Amplitude.chartOptions(data, "Measurements")
+          new Highcharts.chart('container3', data3)
+        })
+    })
+}

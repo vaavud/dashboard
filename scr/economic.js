@@ -4,7 +4,7 @@ var Highcharts = require('highcharts')
 // Current accounting year
 var year = new Date().getFullYear()
 var startDate = new Date(new Date().setDate(new Date().getDate()-30))
-console.log("startDate", startDate)
+// console.log("testDate", testDate)
 var todaysDate = new Date()
 var _MS_PER_DAY = 1000*60*60*24;
 
@@ -23,6 +23,7 @@ function getData(login){
     // var weekSum = accWeek(data)
     var daySum = accDay(data)
     var accSum = accPeriod(daySum)
+    var test = budgetYTD(todaysDate)
     return {"daySum": daySum, "accSum": accSum}
   })
 }
@@ -121,8 +122,8 @@ function sumDays(entries) {
 function accDay(data) { // 1 Array of arrays of entries
   var accDaySum = new Array(31).fill(0)
   var ytd = 0;
-  for (var i = 0; i < data.length; i++) { // for hvert array (5 totalt)
-    var s = sumDays(data[i]) // daySum = array af dagene med salget pr. dag
+  for (var i = 0; i < data.length; i++) { // for each array (5 in total)
+    var s = sumDays(data[i]) // daySum = array of the days with sale per day
     ytd += Math.round(s.actualYTD)
     for (var j = 0; j < s.daySum.length; j++) {
       accDaySum[j] += Math.round(s.daySum[j])
@@ -179,97 +180,157 @@ class Utility {
   }
 }
 
+// Budget on a monthly basic: 151.025 monthly
+// excluding June (5), July(6), August(7) and December(11) with 76.625 a month
+function budget(date) {
+  var month = date.getMonth()
+  var daysInMonth = new Date(date.getFullYear(), date.getMonth()+1, 0).getDate()
+  var dayBudget
+  if (month == 5 || month == 6 || month == 7 || month == 12) {
+    dayBudget = Math.round(76625/daysInMonth)
+  } else {
+    dayBudget = Math.round(151025/daysInMonth)
+  }
+  return dayBudget
+}
 
+function budgetYTD(date) {
+  var budgetM = 0
+  var month = date.getMonth()
+  var daysInMonth = new Date(date.getFullYear(), date.getMonth()+1, 0).getDate()
+  var dayBudget = 0
+  var day = date.getDate()
+
+  if (month == 5 || month == 6 || month == 7 || month == 12) {
+    dayBudget = 76625/daysInMonth
+  } else {
+    dayBudget = 151025/daysInMonth
+  }
+  var extra = dayBudget * day;
+  for (var i = 0; i < month; i++) {
+    if (month == 5 || month == 6 || month == 7 || month == 12) {
+      budgetM +=76625
+    } else {
+      budgetM += 151025
+    }
+  }
+  var budgetYTD = Math.round(budgetM + extra)
+  return budgetYTD;
+}
 
 /* Plotting */
-
 function chartOptions(data) {
   var daySum = data.daySum.accDaySum
   var accSum = data.accSum
   var options = chart
-  var budget = []
+  var budgetDays = []
   var accBudget = []
   var actualYTD = data.daySum.ytd /// PRINT SOMEWHERE!!!
-  // console.log(actualYTD)
+  // var budgetYTD = budgetYTD()
+  // var indexYTD = Math.round(100 + ((actualYTD-budgetYTD)/budgetYTD)*100)
+
   // for (var i = 0; i < weekSum.length; i++) {
   //   weekNumbers[i] = i + 1
   //   budget[i] = 37756
   //   accBudget[i] = 37756*(i+1)
   // }
   var dates = []
+  var sum = 0
   for (var i = 0; i < data.daySum.accDaySum.length; i++) {
     var date = new Date(new Date().setDate(new Date().getDate()-30+i))
     dates[i] = date.toDateString().slice(0,10)
-    budget[i] = Math.round(37756/31)
-    accBudget[i] = Math.round((151024/31)*(i+1))
+    budgetDays[i] = budget(date)
+    // Math.round(151024/31)
+    sum += budgetDays[i]
+    accBudget[i] = sum
+    // Math.round((151024/31)*(i+1))
   }
   options.xAxis[0].categories = dates
   options.series[0].data = daySum
-  options.series[1].data = budget
+  options.series[1].data = budgetDays
   options.series[2].data = accSum
   options.series[3].data = accBudget
+
   return options
 }
 
+function renderer (data) {
+  var actualYTD = data.daySum.ytd /// PRINT SOMEWHERE!!!
+  // var budgetYTD = budgetYTD()
+  // var indexYTD = Math.round(100 + ((actualYTD-budgetYTD)/budgetYTD)*100)
+  varfunction(chart) {
+    chart.renderer.text("test", 140 , 100)
+    .add()
+  })
+}
+
+  return
+}
+
 var chart = {
-  chart: { zoomType: 'xy' },
+  chart: {
+    zoomType: 'xy',
+    renderTo: 'container1'
+  },
   title: {
-    text: 'Sales 2016',
+    text: 'Sales',
     style: {fontFamily: 'Roboto Black Italic', fontWeight: 'bold'}
   },
   // subtitle: { text: 'Source: e-conomic.dk' },
   xAxis: [{
     labels: { style: { color: '#000000' } },
     title: {
-      text: "Week no.",
       style: {color: '#000000'}
      },
     categories: [],
     crosshair: true
   }],
   yAxis: [{ // Primary yAxis
+      floor: 0,
       labels: { style: { color: '#000000' } },
       title: {
         text: 'Amount (DKK)',
-        style: { color: '#000000' }
+        style: { color: '#000000' },
+        offset: 0,
+        rotation: 0,
+        align: "high",
+        y: -10,
       }
     }
   ],
   tooltip: { shared: true },
   legend: {
-    layout: 'vertical',
-    align: 'left',
-    x: 120,
-    verticalAlign: 'top',
-    y: 100,
-    floating: true,
+    layout: 'horizontal',
+    align: 'center',
+    verticalAlign: 'bottom',
+    floating: false,
     backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
   },
-  series: [{
-    name: 'Actual sale',
-    type: 'column',
-    data: [],
-    tooltip: {
-      valueSuffix: ' DKK'
+  series: [
+    {
+      name: 'Actual sale',
+      type: 'column',
+      data: [],
+      tooltip: { valueSuffix: ' DKK' }
+    }, {
+      name: 'Budget',
+      type: 'column',
+      data: [],
+      tooltip: { valueSuffix: ' DKK' }
+    }, {
+      name: 'Acc. sale',
+      type: 'spline',
+      // yAxis: 1,
+      data: [],
+      tooltip: { valueSuffix: ' DKK' }
+    }, {
+      name: 'Acc. budget',
+      type: 'spline',
+      // yAxis: 1,
+      data: [],
+      tooltip: { valueSuffix: ' DKK' }
     }
-  }, {
-    name: 'Budget',
-    type: 'column',
-    data: [],
-    tooltip: { valueSuffix: ' DKK' }
-  }, {
-    name: 'Acc. sale',
-    type: 'spline',
-    // yAxis: 1,
-    data: [],
-    tooltip: { valueSuffix: ' DKK' }
-  }, {
-    name: 'Acc. budget',
-    type: 'spline',
-    // yAxis: 1,
-    data: [],
-    tooltip: { valueSuffix: ' DKK' }
-  }]
+  ],
 }
 
 module.exports = {

@@ -10,25 +10,18 @@ Retrieve Amplitude data
 */
 function getData(iOSlogin, androidLogin, plot){
   var todaysDate = todayOj.toISOString().slice(0,10).replace(/-/g, "")
-  var fourWeeksAgo = new Date(new Date().setDate(new Date().getDate()-27))
-  var startDate = fourWeeksAgo.toISOString().slice(0,10).replace(/-/g, "")
-  var lastMonth = new Date(new Date().setDate(new Date().getDate()-(27*2+1)))
-  var lastMonthStart = lastMonth.toISOString().slice(0,10).replace(/-/g, "")
-  var lastMonthE = new Date(new Date().setDate(new Date().getDate()-28))
-  var lastMonthEnd = lastMonthE.toISOString().slice(0,10).replace(/-/g, "")
+  var startDate = new Date(new Date().setDate(new Date().getDate()-27)).toISOString().slice(0,10).replace(/-/g, "")
+  var lastMonthStart = new Date(new Date().setDate(new Date().getDate()-(27*2+1))).toISOString().slice(0,10).replace(/-/g, "")
+  var lastMonthEnd = new Date(new Date().setDate(new Date().getDate()-28)).toISOString().slice(0,10).replace(/-/g, "")
 
-  // console.log("today " + todaysDate)
-  // console.log("startDate " + startDate)
-  // console.log("lastMonthStart: " + lastMonthStart)
-  // console.log("lastMonthEnd: " + lastMonthEnd)
 
-  // Measurements - Defined as Measure::Began event in Amplitude
+  // Measurements - Defined as Measure::Ended and Measurement::Ended event in Amplitude
   if (plot == "Measurements") {
-    var iOS = getAmplitudeLogin(iOSlogin, "events?e=Measure::Began&start=" + startDate + "&end=" + todaysDate + "&i=1")
-    var android = getAmplitudeLogin(androidLogin, "events?e=Measurement::Began&start=" + startDate + "&end=" + todaysDate + "&i=1")
+    var iOS = getAmplitudeLogin(iOSlogin, "events?e=Measure::Ended&start=" + startDate + "&end=" + todaysDate + "&i=1")
+    var android = getAmplitudeLogin(androidLogin, "events?e=Measurement::Ended&start=" + startDate + "&end=" + todaysDate + "&i=1")
 
-    var iOSLM = getAmplitudeLogin(iOSlogin, "events?e=Measure::Began&start=" + lastMonthStart + "&end=" + lastMonthEnd + "&i=1")
-    var androidLM = getAmplitudeLogin(androidLogin, "events?e=Measurement::Began&start=" + lastMonthStart + "&end=" + lastMonthEnd + "&i=1")
+    var iOSLM = getAmplitudeLogin(iOSlogin, "events?e=Measure::Ended&start=" + lastMonthStart + "&end=" + lastMonthEnd + "&i=1")
+    var androidLM = getAmplitudeLogin(androidLogin, "events?e=Measurement::Ended&start=" + lastMonthStart + "&end=" + lastMonthEnd + "&i=1")
   }
   // Active Users - Defined as unique App::Open event in Amplitude
   if (plot == "ActiveUsers") {
@@ -57,24 +50,15 @@ function getData(iOSlogin, androidLogin, plot){
 
   return Promise.all([iOS, android, iOSLM, androidLM])
   .then(data => {
-    var userData = combinedData(data)
-    return {"userData": userData}
+    var amplitudeCMLM = combinedData(data)
+    return {"amplitudeCMLM": amplitudeCMLM}
   })
 }
-
-  // var measurementsTotal = getAmplitudeLogin(login, "events?e=Measure::Began&start=20160101&end=20160327")
-  // .then(result => {
-  //   console.log(result)
-  // })
-  // Promise.all([activeUsers, measurementsTotal])
-  //   .then(data => {
-  //
-  //   })
 
 function getAmplitudeLogin(login, parameter) {
   return new Promise((resolve, reject) => {
     $.ajax({
-        url: `https://api.vaavud.com/dashboard/amplitude/api/2/${parameter}`,
+        url: `https://api.vaavud.com/dashboard/amplitude/${parameter}`,
         xhrFields: {
           withCredentials: true
         },
@@ -91,48 +75,6 @@ function getAmplitudeLogin(login, parameter) {
   })
 }
 
-// We switched to Amplitude in November 2015, so data prior
-// from Mixpanel is saved in Firebase with data from
-// April 7th 2014 until 31st of December 2015
-// All old data is stored in arrays
-// [268] = 31.12.2014
-// Only to be used through all of 2016
-function getLastYear(data){
-  // Match day of the week
-  var START_2015 = 268
-  var DAYS_IN_YEAR = 365
-  var weekDay = new Date(new Date().setDate(new Date().getDate()-DAYS_IN_YEAR)).getDay()
-  console.log("weekDay2015: " + weekDay)
-  console.log("dayOfWeek2016: " + todayOj.getDay())
-  var diff = weekDay - todayOj.getDay()
-  // Week days goes from 0 to 6
-  if (Math.abs(diff) > 3) {
-    var actualDiff = 7 - Math.abs(diff)
-    if (diff < -3){
-    var dateLY = new Date(new Date().setDate(new Date().getDate()-DAYS_IN_YEAR-actualDiff))
-    console.log("diff < -3, new date: " + dateLY)
-  } else if (diff > 3) {
-    var dateLY = new Date(new Date().setDate(new Date().getDate()-DAYS_IN_YEAR+actualDiff))
-    console.log("diff > 3, new date: " + dateLY)
-    }
-  } else {
-  var dateLY = new Date(new Date().setDate(new Date().getDate()-DAYS_IN_YEAR-diff))
-  // console.log("new date: " + dateLY)
-}
-  // Months goes from 0-11 - 01.01.2015 = 2015,00,01
-  var array = Math.round(Math.abs((dateLY.getTime()-new Date(2015,00,01).getTime())/(_MS_PER_DAY)))+START_2015
-  // var endDate = data[array]
-  // console.log("endDate " + endDate + ", " + array)
-  // var startDate = data[array-27]
-  // console.log("startDate " + startDate + ", " + (array-27))
-  var newArray = data.slice((array-27),array+1)
-  var sum = 0
-  for (var i = 0; i < newArray.length; i++) {
-    sum += newArray[i]
-  }
-  // console.log(newArray)
-  return newArray
-}
 
 function combinedData(data) { // 1 Array of arrays of data
   var combined = new Array(displayDays).fill(0)
@@ -148,15 +90,40 @@ function combinedData(data) { // 1 Array of arrays of data
   return {"combined": combined, "combinedLM": combinedLM}
 }
 
-function chartOptions(data, title, lastYear) {
-var options = chart
+/*************************/
+/*   ADD MIXPANEL DATA   */
+/*************************/
+function combineAll(data) {
+  var combined = new Array(displayDays).fill(0)
+  var combinedLM = new Array(displayDays).fill(0)
+  var lastYear = data[0].mixpanelLastYear
+  var array = new Array(4);
+  array[0] = data[0].mixpanelCMLM.combined;
+  array[1] = data[1].amplitudeCMLM.combined;
+  array[2] = data[0].mixpanelCMLM.combinedLM;
+  array[3] = data[1].amplitudeCMLM.combinedLM;
+  for (var i = 0; i < 2; i++) {
+    var s = array[i]
+    var t = array[i+2]
+    for (var j = 0; j < s.length; j++) {
+      combined[j] += s[j]
+      combinedLM[j] += t[j]
+    }
+  }
+  return {"combined": combined, "combinedLM": combinedLM, "lastYear": lastYear}
+}
+
+
+function chartOptions(data, title) {
+  console.log(data)
+  var options = chart
+
   if (title == "Downloads" || title == "Notifications added") {
     options = chart1;
   }
 
-  if (lastYear != null){
-    options.series[2].data = getLastYear(lastYear)
-    console.log(title)
+  if (data.amplitudeCMLM.lastYear != null){
+    options.series[2].data = data.amplitudeCMLM.lastYear
   }
 
   var dates = []
@@ -166,9 +133,10 @@ var options = chart
   }
 
   options.title.text = title
+  options.series[0].data = data.amplitudeCMLM.combined
+  options.series[1].data = data.amplitudeCMLM.combinedLM
   options.xAxis[0].categories = dates
-  options.series[0].data = data.userData.combined
-  options.series[1].data = data.userData.combinedLM
+
   return options
 }
 
@@ -177,50 +145,50 @@ var chart = {
   title: { text: '' },
   // subtitle: { text: 'Source: amplitude.com' },
   xAxis: [{
-    title: { text: "Date" },
+    labels: {
+      style: {color: '#000000'}
+    },
     categories: [],
     crosshair: true
   }],
   yAxis: [{ // Primary yAxis
-      labels: { style: { color: Highcharts.getOptions().colors[1] } },
+      labels: { style: { color: '#000000' } },
       title: {
         text: 'Amount (no)',
-        style: { color: Highcharts.getOptions().colors[1] }
+        style: { color: '#000000' }
       }
     }
   ],
   tooltip: { shared: true },
   legend: {
-    layout: 'vertical',
-    align: 'left',
-    x: 120,
-    verticalAlign: 'top',
-    y: 100,
-    floating: true,
+    layout: 'horizontal',
+    align: 'center',
+    verticalAlign: 'bottom',
+    floating: false,
     backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
   },
   series: [{
     name: 'Actual',
     type: 'spline',
     data: [],
-    tooltip: {
-      valueSuffix: ' users'
-    }
+    // tooltip: {
+    //   valueSuffix: ' users'
+    // }
   }, {
     name: 'Last month',
     type: 'spline',
     data: [],
-    tooltip: {
-      valueSuffix: ' users'
-    }
+    // tooltip: {
+    //   valueSuffix: ' users'
+    // }
   }, {
     name: 'Last year',
     type: 'spline',
     data: [],
-    // color: '7a868c',
-    tooltip: {
-      valueSuffix: ' users'
-    }
+    color: '#7a868c',
+    // tooltip: {
+    //   valueSuffix: ' users'
+    // }
   }]
 }
 
@@ -229,47 +197,48 @@ var chart1 = {
   title: { text: '' },
   // subtitle: { text: 'Source: amplitude.com' },
   xAxis: [{
-    title: { text: "Date" },
+    labels: {
+      style: {color: '#000000'}
+    },
     categories: [],
     crosshair: true
   }],
   yAxis: [{ // Primary yAxis
-      labels: { style: { color: Highcharts.getOptions().colors[1] } },
+      labels: { style: { color: '#000000' } },
       title: {
         text: 'Amount (no)',
-        style: { color: Highcharts.getOptions().colors[1] }
+        style: { color: '#000000' }
       }
     }
   ],
   tooltip: { shared: true },
   legend: {
-    layout: 'vertical',
-    align: 'left',
-    x: 120,
-    verticalAlign: 'top',
-    y: 100,
-    floating: true,
+    layout: 'horizontal',
+    align: 'center',
+    verticalAlign: 'bottom',
+    floating: false,
     backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
   },
   series: [{
     name: 'Actual',
     type: 'spline',
     data: [],
-    tooltip: {
-      valueSuffix: ' users'
-    }
+    // tooltip: {
+    //   valueSuffix: ' users'
+    // }
   }, {
     name: 'Last month',
     type: 'spline',
     data: [],
-    tooltip: {
-      valueSuffix: ' users'
-    }
+    // tooltip: {
+    //   valueSuffix: ' users'
+    // }
   }]
 }
 
 
 module.exports = {
   getData: getData,
-  chartOptions: chartOptions
+  chartOptions: chartOptions,
+  combineAll: combineAll,
 }

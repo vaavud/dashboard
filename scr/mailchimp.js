@@ -80,7 +80,6 @@ function maxOpen(data){
 
 /* Plotting */
 function chartOptions(data) {
-  // console.log(data)
   var sentTo = data.sentTo
   var campaignTitle = data.title
   var openRate = data.openRate
@@ -99,6 +98,13 @@ var chart = {
   title: { text: 'Mailchimp campaigns' },
   // subtitle: { text: 'Source: mailchimp.com' },
   xAxis: [{
+    useHTML: true,
+    width: '1px',
+    labels: {
+      style: {
+        color: '#000000'
+        }
+      },
     categories: [],
     title: {
       // text: 'campaigns',
@@ -107,13 +113,19 @@ var chart = {
     crosshair: true
   }],
   yAxis: [{ // Primary yAxis
-      labels: { style: { color: '#000000' } },
+      tickPositions: [0, 10000, 20000, 30000, 40000],
+      labels: {
+        style: { color: '#000000' }
+      },
       title: {
         text: 'Emails sent',
         style: { color: '#000000' }
       }
     }, { // Secondary yAxis
-        labels: { format: '{value} %', style: { color: '#000000' } },
+        tickPositions: [0, 25, 50, 75, 100],
+        labels: {
+          format: '{value}%',
+          style: { color: '#000000' } },
         title: {
           text: 'Open - & click rate',
           style: { color: '#000000' }
@@ -122,12 +134,12 @@ var chart = {
       }],
   tooltip: { shared: true },
   legend: {
-    layout: 'vertical',
-    align: 'left',
-    x: 120,
-    verticalAlign: 'top',
-    y: 100,
-    floating: true,
+    layout: 'horizontal',
+    align: 'center',
+    // x: 140,
+    verticalAlign: 'bottom',
+    // y: 100,
+    floating: false,
     backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
   },
   series: [{
@@ -142,13 +154,13 @@ var chart = {
     type: 'spline',
     yAxis: 1,
     data: [],
-    tooltip: { valueSuffix: ' %' }
+    tooltip: { valueSuffix: '%' }
   }, {
     name: 'Click rate',
     type: 'spline',
     yAxis: 1,
     data: [],
-    tooltip: { valueSuffix: ' %' }
+    tooltip: { valueSuffix: '%' }
   }]
 }
 
