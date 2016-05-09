@@ -8,6 +8,8 @@ var Amplitude = require('./amplitude.js')
 var Mailchimp = require('./mailchimp.js')
 var Mixpanel = require('./mixpanel.js')
 
+require("babel-polyfill")
+
 /* Vaavud colors */
 // Red - Blue
 new Highcharts.setOptions({
