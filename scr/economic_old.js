@@ -3,8 +3,8 @@ var Highcharts = require('highcharts')
 
 // Current accounting year
 var year = new Date().getFullYear()
-var dayInMonth = new Date().getDate()
-var startDate = new Date(new Date().setDate(new Date().getDate()-(dayInMonth-1)))
+var startDate = new Date(new Date().setDate(new Date().getDate()-30))
+// console.log("testDate", testDate)
 var todaysDate = new Date()
 var _MS_PER_DAY = 1000*60*60*24;
 
@@ -92,7 +92,7 @@ function getEconomicAccount(login, account) {
 //   return weekSum
 // }
 function sumDays(entries) {
-  var daySum = new Array(dayInMonth).fill(0)
+  var daySum = new Array(31).fill(0)
   var actualYTD = 0;
   for (var i = 0; i < entries.length; i++) {
     var date = Utility.parseDate(entries[i].date)
@@ -120,7 +120,7 @@ function sumDays(entries) {
 // }
 // Returns an array for each day the last month and actual sales
 function accDay(data) { // 1 Array of arrays of entries
-  var accDaySum = new Array(dayInMonth).fill(0)
+  var accDaySum = new Array(31).fill(0)
   var ytd = 0;
   for (var i = 0; i < data.length; i++) { // for each array (5 in total)
     var s = sumDays(data[i]) // daySum = array of the days with sale per day
@@ -143,7 +143,7 @@ function accDay(data) { // 1 Array of arrays of entries
 // }
 
 function accPeriod(daySum) {
-  var accPeriod = new Array(dayInMonth).fill(0)
+  var accPeriod = new Array(31).fill(0)
   var sum = 0
   for (var i = 0; i < daySum.accDaySum.length; i++) {
     sum += daySum.accDaySum[i]
@@ -215,6 +215,7 @@ function budgetYTD() {
     }
   }
   var budgetYTD = Math.round(budgetM + extra)
+  console.log(budgetYTD)
   return budgetYTD;
 }
 
@@ -226,6 +227,7 @@ function chartOptions(data) {
   var budgetDays = []
   var accBudget = []
   var budget_test = budgetYTD()
+  console.log(budget_test)
 
   // for (var i = 0; i < weekSum.length; i++) {
   //   weekNumbers[i] = i + 1
@@ -235,8 +237,8 @@ function chartOptions(data) {
   var dates = []
   var sum = 0
   for (var i = 0; i < data.daySum.accDaySum.length; i++) {
-    var date = new Date(new Date().setDate(new Date().getDate()-(dayInMonth-1)+i))
-    dates[i] = date.toDateString().slice(3,10)
+    var date = new Date(new Date().setDate(new Date().getDate()-30+i))
+    dates[i] = date.toDateString().slice(0,10)
     budgetDays[i] = budget(date)
     // Math.round(151024/31)
     sum += budgetDays[i]
@@ -254,13 +256,11 @@ function chartOptions(data) {
 
 function renderer (data) {
   var actualYTD = data.daySum.ytd
-  var budget = budgetYTD()
+  var budget_ytd = "613.844"
   // var budget_ytd = budgetYTD()
-  var indexYTD = Math.round((((actualYTD-budget)/budget)*100)+100);
-  var ytdText = function(chart) {
-    chart.renderer.text("Actual YTD: " + Math.round((actualYTD/1000)) + "k DKK", 100 , 60)
-    // Thusand seperator
-    // .toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+  var indexYTD = Math.round((((actualYTD-613844)/613844)*100)+100);
+  var ytd = function(chart) {
+    chart.renderer.text("Actual YTD: " + actualYTD.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + " DKK", 100 , 65)
     .css({
       // color: '#7a868c',
       fontSize: '13px',
@@ -268,20 +268,20 @@ function renderer (data) {
       // fontWeight: 'Bold'
     })
     .add()
-    chart.renderer.text("Budget YTD: " + Math.round((budget/1000)) + "k DKK", 100 , 75)
+    chart.renderer.text("Budget YTD: " + budget_ytd + " DKK", 100 , 85)
     .css({
       // color: '#7a868c',
       fontSize: '13px'
     })
     .add()
-    chart.renderer.text("Index: " + indexYTD, 100 , 95)
+    chart.renderer.text("Index: " + indexYTD, 100 , 105)
     .css({
       // color: '#7a868c',
       fontSize: '13px'
     })
     .add()
   }
-  return ytdText
+  return ytd
 }
 
 var chart = {
@@ -290,7 +290,7 @@ var chart = {
     renderTo: 'container1'
   },
   title: {
-    text: 'Sales - current month',
+    text: 'Sales',
     style: {fontFamily: 'Roboto Black Italic', fontWeight: 'bold'}
   },
   // subtitle: { text: 'Source: e-conomic.dk' },
@@ -304,7 +304,7 @@ var chart = {
   }],
   yAxis: [{ // Primary yAxis
       floor: 0,
-      labels: { style: { color: '#000000', fontSize: '12px' } },
+      labels: { style: { color: '#000000' } },
       title: {
         text: 'Amount (DKK)',
         style: { color: '#000000' },

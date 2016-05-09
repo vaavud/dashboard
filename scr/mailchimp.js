@@ -118,7 +118,7 @@ var chart = {
         style: { color: '#000000' }
       },
       title: {
-        text: 'Emails sent',
+        text: 'Subscribers',
         style: { color: '#000000' }
       }
     }, { // Secondary yAxis
@@ -143,7 +143,7 @@ var chart = {
     backgroundColor: (Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'
   },
   series: [{
-    name: 'Emails sent',
+    name: 'Subscribers',
     type: 'column',
     data: [],
     // tooltip: {

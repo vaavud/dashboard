@@ -30,9 +30,10 @@ $(document).ready(function() {
         var password = getQueryVariable('password');
 
         // else login manual
-        if (email == false || password == false){
-          $('#password').keypress(function(e) {
-              if (e.keyCode == 13) {
+        // if (email == false || password == false){
+        //   $('#password').keypress(function(e) {
+        //       if (e.keyCode == 13) {
+        $('#submit').click(function() {
                 var email = $('#email').val();
                 var password = $('#password').val();
 
@@ -41,16 +42,14 @@ $(document).ready(function() {
                   password: password
                 }, authHandler);
 
-                $('#password').val('');
-            }
-          })
-        }
+              })
+
         ref.authWithPassword({
           email: email,
           password: password
         }, authHandler);
-
 });
+
 
 // Read login credentials from URL
 function getQueryVariable(variable) {
@@ -65,16 +64,11 @@ function getQueryVariable(variable) {
    return (false);
  }
 
-// Password automatication
-// ref.authWithPassword({
-//   email: "maria@vaavud.com",
-//   password: "1234"
-// }, authHandler);
-
 
 function authHandler(error, authData) {
   if (error) {
     console.log("Login Failed!", error);
+    // alert("Login failed - please try again")
   } else {
     document.getElementById('login').style.visibility = 'hidden';
     console.log("Authenticated successfully with payload:", authData);
@@ -87,24 +81,18 @@ function authHandler(error, authData) {
 }
 
 /*
-Retrive login credentials from firebase to 3Party Services
+Retrive login credentials from firebase to 3rd Party Services
 */
 function get3PartyDetails() {
   ref.child('/').once("value", function(snap) {
-    // E-conomic data
     console.log(`data loaded! ${Object.keys(snap.val()).length}`);
+
+    // E-conomic data
     var economicData = Economic.getData(snap.val()["E-conomic"]);
     economicData.then(data => {
       var data1 = Economic.chartOptions(data)
-      var ytd = Economic.renderer(data)
-      new Highcharts.chart('container1', data1, ytd)
-
-      new Highcharts.chart('container1', data1, function (chart) {
-        console.log('test')
-        chart.renderer.text('test', 140, 100)
-        .add();
-      })
-
+      var ytdText = Economic.renderer(data)
+      new Highcharts.chart('container1', data1, ytdText)
     })
 
     // Amplitude data

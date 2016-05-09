@@ -24,10 +24,11 @@ function getData(login, plot){
     var lastMonth1 = getMixpanelLogin(login, "event=Stop Measurement&unit=day&from_date=" + lastMonthStart + "&to_date=" + lastMonthEnd)
     var lastMonth2 = getMixpanelLogin(login, "event=Measurement::Ended&unit=day&from_date=" + lastMonthStart + "&to_date=" + lastMonthEnd)
 
-    var lastYear = getMixpanelLogin(login, "event=Stop Measurement&unit=day&from_date=" + lastYearStart + "&to_date=" + lastYearEnd)
+    // var lastYear = getMixpanelLogin(login, "event=Stop Measurement&unit=day&from_date=" + lastYearStart + "&to_date=" + lastYearEnd)
   }
 
   // Active Users - Defined as unique Open App for lastYear and Open App & App::Open for currentMonth and lastMonth
+  // App::Open is duplicates
   if (plot == "ActiveUsers") {
     var currentMonth1 = getMixpanelLogin(login, "type=unique&event=Open App&unit=day&from_date=" + startDate + "&to_date=" + todaysDate)
     var m1 = "Open App"
@@ -37,10 +38,11 @@ function getData(login, plot){
     var lastMonth1 = getMixpanelLogin(login, "type=unique&event=Open App&unit=day&from_date=" + lastMonthStart + "&to_date=" + lastMonthEnd)
     var lastMonth2 = getMixpanelLogin(login, "type=unique&event=App::Open&unit=day&from_date=" + lastMonthStart + "&to_date=" + lastMonthEnd)
 
-    var lastYear = getMixpanelLogin(login, "type=unique&event=Open App&unit=day&from_date=" + lastYearStart + "&to_date=" + lastYearEnd)
+    // var lastYear = getMixpanelLogin(login, "type=unique&event=Open App&unit=day&from_date=" + lastYearStart + "&to_date=" + lastYearEnd)
   }
 
-  return Promise.all([currentMonth1, currentMonth2, lastMonth1, lastMonth2, lastYear, m1, m2])
+  // return Promise.all([currentMonth1, currentMonth2, lastMonth1, lastMonth2, lastYear, m1, m2])
+  return Promise.all([currentMonth1, currentMonth2, lastMonth1, lastMonth2, m1, m2])
   .then(data => {
     var combine = new Array(4)
 
@@ -53,9 +55,10 @@ function getData(login, plot){
     var lM2S = sortValues(data[3]["data"]["values"][m2])
     combine[3] = lM2S
 
-    var mixpanelLastYear = sortValues(data[4]["data"]["values"][m1])
+    // var mixpanelLastYear = sortValues(data[4]["data"]["values"][m1])
     var mixpanelCMLM = combinedData(combine)
-    return {"mixpanelCMLM": mixpanelCMLM, "mixpanelLastYear": mixpanelLastYear}
+    return {"mixpanelCMLM": mixpanelCMLM}
+    // return {"mixpanelCMLM": mixpanelCMLM, "mixpanelLastYear": mixpanelLastYear}
   })
 }
 
