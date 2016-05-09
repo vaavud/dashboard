@@ -1,3 +1,5 @@
+'use strict'
+
 var $ = require('jquery')
 var displayDays = 28;
 var todayOj = new Date()
@@ -85,7 +87,7 @@ function getMixpanelLogin(login, parameter) {
 function sortValues(data){
   var arrayN = new Array(displayDays).fill(0)
   var count = 0
-  for (key in data) {
+  for (let key in data) {
     arrayN[count] = new Array(1).fill(0)
     arrayN[count][0] = new Date(key)
     arrayN[count][1] = data[key]

@@ -45,6 +45,7 @@ function report(data){
   //var maxOpenRate = maxOpen(data)
   var length = data["campaigns"].length
   var arrayFull = 0
+  var id
   for (var i = 0; arrayFull < 10; i++) {
     var j = length-1-i
     // Exclude BoD material id = 5a0bd8131f & small campaigns email_sent < 20

@@ -29,8 +29,8 @@
     "predev": "mkdirp dev",
     "dev": "parallelshell 'npm run dev:js' 'npm run dev:bs' 'npm run dev:cp'",
     "dev:js": "webpack --watch",
-    "dev:bs": "browser-sync start --server 'dev' --files 'dev/*'",
-    "dev:cp": "sane 'cp -R src dev' --glob='src/index.html'",
+    "dev:bs": "browser-sync start --server 'dev' --files 'dev/*' --port 8080",
+    "dev:cp": "sane 'cp -R src/index.html dev' --glob='src/index.html'",
     "predeploy": "npm run build",
     "deploy": "firebase deploy"
   },
