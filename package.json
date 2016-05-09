@@ -6,16 +6,33 @@
   "dependencies": {
     "firebase": "^2.4.1",
     "highcharts": "^4.2.3",
-    "highcharts-browserify": "^2.0.2",
-    "jquery": "^2.2.2"
+    "jquery": "^2.2.2",
+    "babel-polyfill": "^6.3.14"
   },
   "devDependencies": {
-    "browserify": "^13.0.0",
-    "watchify": "^3.7.0"
+    "babel": "^5.8.23",
+    "babel-core": "^5.8.24",
+    "babel-loader": "^5.3.2",
+    "browser-sync": "^2.10.0",
+    "mkdirp": "^0.5.1",
+    "parallelshell": "^1.2.0",
+    "sane": "^1.3.0",
+    "webpack": "^1.12.2",
+    "webpack-notifier": "^1.2.1"
   },
   "scripts": {
-    "build": "browserify scr/main.js -o public/bundle.js",
-    "watch": "watchify scr/main.js -o public/bundle.js --debug"
+    "prebuild": "mkdirp build",
+    "build": "parallelshell 'npm run build:js' 'npm run build:cp'",
+    "build:js": "export NODE_ENV=production && webpack -p",
+    "build:bs": "browser-sync start --server 'build' --files 'build/*'",
+    "build:cp": "cp -R src/index.html build",
+    "predev": "mkdirp dev",
+    "dev": "parallelshell 'npm run dev:js' 'npm run dev:bs' 'npm run dev:cp'",
+    "dev:js": "webpack --watch",
+    "dev:bs": "browser-sync start --server 'dev' --files 'dev/*'",
+    "dev:cp": "sane 'cp -R src dev' --glob='src/index.html'",
+    "predeploy": "npm run build",
+    "deploy": "firebase deploy"
   },
   "repository": {
     "type": "git",
