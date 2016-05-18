@@ -2,6 +2,8 @@
 
 // Constants
 const MS_PER_DAY = 1000*60*60*24
+const DISPLAY_DAYS = 28
+const DISPLAY_CAMPAIGNS = 10
 
 
 function parseDate(input) {
@@ -34,5 +36,7 @@ module.exports = {
   daysInMonth: daysInMonth,
   const: {
     MS_PER_DAY: MS_PER_DAY,
+    DISPLAY_DAYS: DISPLAY_DAYS,
+    DISPLAY_CAMPAIGNS: DISPLAY_CAMPAIGNS,
   }
 }

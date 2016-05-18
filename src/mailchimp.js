@@ -1,5 +1,6 @@
 var $ = require('jquery')
 var Highcharts = require('highcharts')
+var U = require('./utility.js')
 
 /*
 Retrieve Mailchimp data - included the 10 newest campaigns
@@ -38,10 +39,10 @@ function getMailchimpLogin(login, parameter) {
 }
 
 function report(data){
-  var sentTo = new Array(10).fill(0)
-  var title = new Array(10).fill(0)
-  var openRate = new Array(10).fill(0)
-  var clickRate = new Array(10).fill(0)
+  var sentTo = new Array(U.const.DISPLAY_CAMPAIGNS).fill(0)
+  var title = new Array(U.const.DISPLAY_CAMPAIGNS).fill(0)
+  var openRate = new Array(U.const.DISPLAY_CAMPAIGNS).fill(0)
+  var clickRate = new Array(U.const.DISPLAY_CAMPAIGNS).fill(0)
   //var maxOpenRate = maxOpen(data)
   var length = data["campaigns"].length
   var arrayFull = 0

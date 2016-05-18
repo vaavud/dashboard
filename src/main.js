@@ -94,18 +94,18 @@ function sales(credentials) {
     })
 }
 
-// Active users from Amplitude and compared to last year data from Mixpanle
+// Active users from Amplitude and compared to last year data from Mixpanel
 function activeUsers(credentials) {
-  var mixActiveUsers = Mixpanel.getData(credentials["Mixpanel"], "ActiveUsers");
-  var activeUsers = Amplitude.getData(credentials["Amplitude-iOS"], credentials["Amplitude-Android"], "ActiveUsers");
+  var mixActiveUsers = Mixpanel.getData(credentials["Mixpanel"], "activeUsers");
+  var activeUsers = Amplitude.getData(credentials["Amplitude-iOS"], credentials["Amplitude-Android"], "activeUsers");
   Promise.all([mixActiveUsers, activeUsers])
     .then(data => {
-      var amplitudeCMLM = Amplitude.combineAll(data);
-      return {
-        "amplitudeCMLM": amplitudeCMLM
-      }
+      console.log("test1" + data)
+      return Amplitude.joinMixpanelAndAmplitude(data)
+
     })
     .then(data => {
+      console.log("test2" + data)
       var chartOptions = Amplitude.chartOptions(data, "Active users")
       new Highcharts.chart('container2', chartOptions)
     })
@@ -113,23 +113,20 @@ function activeUsers(credentials) {
 
 // Notifications added from Amplitude
 function notifications(credentials) {
-  Amplitude.getData(credentials["Amplitude-iOS"], credentials["Amplitude-Android"], "Notifications added")
+  Amplitude.getData(credentials["Amplitude-iOS"], credentials["Amplitude-Android"], "notifications")
   .then(data => {
     var chartOptions = Amplitude.chartOptions(data, "Notifications added")
     new Highcharts.chart('container5', chartOptions)
   })
 }
 
-// Measurements from Amplitude nd compared to last year data from Mixpanle
+// Measurements from Amplitude nd compared to last year data from Mixpanel
 function measurements(credentials) {
-  var mixMeasurements = Mixpanel.getData(credentials["Mixpanel"], "Measurements");
-  var measurements = Amplitude.getData(credentials["Amplitude-iOS"], credentials["Amplitude-Android"], "Measurements");
+  var mixMeasurements = Mixpanel.getData(credentials["Mixpanel"], "measurements");
+  var measurements = Amplitude.getData(credentials["Amplitude-iOS"], credentials["Amplitude-Android"], "measurements");
   Promise.all([mixMeasurements, measurements])
     .then(data => {
-      var amplitudeCMLM = Amplitude.combineAll(data);
-      return {
-        "amplitudeCMLM": amplitudeCMLM
-      }
+      return Amplitude.joinMixpanelAndAmplitude(data)
     })
     .then(data => {
       var chartOptions = Amplitude.chartOptions(data, "Measurements")
@@ -139,7 +136,7 @@ function measurements(credentials) {
 
 // Downloads from Apmplitude
 function downloads(credentials) {
-  Amplitude.getData(credentials["Amplitude-iOS"], credentials["Amplitude-Android"], "Downloads")
+  Amplitude.getData(credentials["Amplitude-iOS"], credentials["Amplitude-Android"], "downloads")
   .then(data => {
     var chartOptions = Amplitude.chartOptions(data, "Downloads")
     new Highcharts.chart('container4', chartOptions)

@@ -3,7 +3,6 @@
 var $ = require('jquery')
 var displayDays = 28;
 var todayOj = new Date()
-var _MS_PER_DAY = 1000*60*60*24
 /*
 Retrieve Mixpanel data
 */
@@ -16,7 +15,7 @@ function getData(login, plot){
   var lastYearEnd = new Date(new Date().setDate(new Date().getDate()-(7*52))).toISOString().slice(0,10)
 
   // Measurements - Defined as Stop Measurement for lastYear and Stop Measurement & Measurement::Ended for currentMonth and lastMonth
-  if (plot == "Measurements") {
+  if (plot == "measurements") {
     var currentMonth1 = getMixpanelLogin(login, "event=Stop Measurement&unit=day&from_date=" + startDate + "&to_date=" + todaysDate)
     var m1 = "Stop Measurement"
 
@@ -31,7 +30,7 @@ function getData(login, plot){
 
   // Active Users - Defined as unique Open App for lastYear and Open App & App::Open for currentMonth and lastMonth
   // App::Open is duplicates
-  if (plot == "ActiveUsers") {
+  if (plot == "activeUsers") {
     var currentMonth1 = getMixpanelLogin(login, "type=unique&event=Open App&unit=day&from_date=" + startDate + "&to_date=" + todaysDate)
     var m1 = "Open App"
     var currentMonth2 = getMixpanelLogin(login, "type=unique&event=App::Open&unit=day&from_date=" + startDate + "&to_date=" + todaysDate)
