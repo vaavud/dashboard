@@ -117,15 +117,15 @@ function combineAll(data) {
 function chartOptions(data, title) {
   // console.log(data)
   // var options = chart
-  var options = chart1
+  var options = chart
 
-  // if (title == "Downloads" || title == "Notifications added") {
-  //   options = chart1;
-  // }
+  if (title == "Downloads" || title == "Notifications added") {
+    options = chart1;
+  }
 
-  // if (data.amplitudeCMLM.lastYear != null){
-  //   options.series[2].data = data.amplitudeCMLM.lastYear
-  // }
+  if (data.amplitudeCMLM.lastYear != null){
+    options.series[2].data = data.amplitudeCMLM.lastYear
+  }
 
   var dates = []
   for (var i = 0; i < displayDays; i++) {

@@ -1,12 +1,6 @@
 var $ = require('jquery')
 var Highcharts = require('highcharts')
-
-// Current accounting year
-var year = new Date().getFullYear()
-var dayInMonth = new Date().getDate()
-var startDate = new Date(new Date().setDate(new Date().getDate()-(dayInMonth-1)))
-var todaysDate = new Date()
-var _MS_PER_DAY = 1000*60*60*24;
+var U = require('./utility.js')
 
 /*
 Retrive e-conomic data
@@ -32,7 +26,7 @@ function getData(login){
 function getEconomicAccountPage(login, account, page) {
   return new Promise((resolve, reject) => {
     $.ajax({
-        url: `https://restapi.e-conomic.com/ACCOUNTS/${account}/ACCOUNTING-YEARS/`+ year + `/entries?skippages=${page}&pagesize=1000`,
+        url: `https://restapi.e-conomic.com/ACCOUNTS/${account}/ACCOUNTING-YEARS/`+ U.currentYear() + `/entries?skippages=${page}&pagesize=1000`,
         dataType: "json",
         headers: {
           "X-AppSecretToken": login.AppSecretToken,
@@ -76,31 +70,16 @@ function getEconomicAccount(login, account) {
 
 }
 
-/* Data manipulation */
-// function sumWeeks(entries) {
-//   var weekSum = Utility.weekZerosArray() // array with 15 spaces
-//   for (var i = 0; i < entries.length; i++) { // entries.lenght is all entries on that account
-//     var date = Utility.parseDate(entries[i].date) //the date of the entry eg. Fri Jan 01 2016 Timestamp+Timezone
-//     var yearWeek = Utility.getWeekNumber(Utility.parseDate(entries[i].date)) // array with year and week no
-//     if (yearWeek[0] == new Date().getFullYear() && date < new Date() )  {
-//       // hvis entry er samme år som nuværende år og tidligere end idag
-//       weekSum[yearWeek[1]-1] -= entries[i].amountInBaseCurrency
-//       /*console.log(entries[i].amountInBaseCurrency)*/
-//     }
-//   }
-//   console.log(weekSum)
-//   return weekSum
-// }
 function sumDays(entries) {
-  var daySum = new Array(dayInMonth).fill(0)
+  var daySum = new Array(U.currentDayInMonth()).fill(0)
   var actualYTD = 0;
   for (var i = 0; i < entries.length; i++) {
-    var date = Utility.parseDate(entries[i].date)
+    var date = U.parseDate(entries[i].date)
     actualYTD -= entries[i].amountInBaseCurrency
-    if (+startDate <= +date && +date <= +todaysDate)  {
-      var utc1 = Date.UTC(startDate.getFullYear(), startDate.getMonth(), startDate.getDate())
+    if (+U.currentStartDay() <= +date && +date <= +new Date())  {
+      var utc1 = Date.UTC(U.currentStartDay().getFullYear(), U.currentStartDay().getMonth(), U.currentStartDay().getDate())
       var utc2 = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate())
-      var diff = Math.floor((utc2 - utc1)/_MS_PER_DAY)
+      var diff = Math.floor((utc2 - utc1)/U.const.MS_PER_DAY)
       daySum[diff] -= entries[i].amountInBaseCurrency
     }
   }
@@ -108,19 +87,9 @@ function sumDays(entries) {
   return {"daySum": daySum, "actualYTD": actualYTD}
 }
 
-// function accWeek(data) { // 1 Array of arrays of entries
-//   var accWeekSum = Utility.weekZerosArray() //15
-//   for (var i = 0; i < data.length; i++) { // data length = 5 arrays
-//     var s = sumWeeks(data[i]) // Forwarding the 1st array of entries
-//     for (var j = 0; j < s.length; j++) {
-//       accWeekSum[j] += Math.round(s[j])
-//     }
-//   }
-//   return accWeekSum
-// }
 // Returns an array for each day the last month and actual sales
 function accDay(data) { // 1 Array of arrays of entries
-  var accDaySum = new Array(dayInMonth).fill(0)
+  var accDaySum = new Array(U.currentDayInMonth()).fill(0)
   var ytd = 0;
   for (var i = 0; i < data.length; i++) { // for each array (5 in total)
     var s = sumDays(data[i]) // daySum = array of the days with sale per day
@@ -132,18 +101,8 @@ function accDay(data) { // 1 Array of arrays of entries
   return {"accDaySum": accDaySum, "ytd": ytd}
 }
 
-// function accYTD(weekSum) {
-//   var accYTD = Utility.weekZerosArray()
-//   var sum = 0
-//   for (var i = 0; i < weekSum.length; i++) {
-//     sum += weekSum[i]
-//     accYTD[i] += sum
-//   }
-//   return accYTD
-// }
-
 function accPeriod(daySum) {
-  var accPeriod = new Array(dayInMonth).fill(0)
+  var accPeriod = new Array(U.currentDayInMonth()).fill(0)
   var sum = 0
   for (var i = 0; i < daySum.accDaySum.length; i++) {
     sum += daySum.accDaySum[i]
@@ -152,33 +111,8 @@ function accPeriod(daySum) {
   return accPeriod
 }
 
-class Utility {
-  static weekZerosArray() {
-      var currentWeek = Utility.getWeekNumber(new Date())[1]
-      return new Array(currentWeek).fill(0)
-    }
-    // parse a date in yyyy-mm-dd format
-  static parseDate(input) {
-    var parts = input.split('-');
-    // new Date(year, month [, day [, hours[, minutes[, seconds[, ms]]]]])
-    return new Date(parts[0], parts[1] - 1, parts[2]); // Note: months are 0-based
-  }
 
-  static getWeekNumber(d) {
-    // Copy date so don't modify original
-    d = new Date(+d);
-    d.setHours(0, 0, 0);
-    // Set to nearest Thursday: current date + 4 - current day number
-    // Make Sunday's day number 7
-    d.setDate(d.getDate() + 4 - (d.getDay() || 7));
-    // Get first day of year
-    var yearStart = new Date(d.getFullYear(), 0, 1);
-    // Calculate full weeks to nearest Thursday
-    var weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
-    // Return array of year and week number
-    return [d.getFullYear(), weekNo];
-  }
-}
+
 
 // Budget on a monthly basic: 151.025 monthly
 // excluding June (5), July(6), August(7) and December(11) with 76.625 a month
@@ -196,10 +130,10 @@ function budget(date) {
 
 function budgetYTD() {
   var budgetM = 0
-  var month = todaysDate.getMonth()
-  var daysInMonth = new Date(todaysDate.getFullYear(), todaysDate.getMonth()+1, 0).getDate()
+  var month = new Date().getMonth()
+  var daysInMonth = U.daysInMonth(new Date())
   var dayBudget = 0
-  var day = todaysDate.getDate()
+  var day = new Date().getDate()
 
   if (month == 5 || month == 6 || month == 7 || month == 12) {
     dayBudget = 76625/daysInMonth
@@ -226,16 +160,10 @@ function chartOptions(data) {
   var budgetDays = []
   var accBudget = []
   var budget_test = budgetYTD()
-
-  // for (var i = 0; i < weekSum.length; i++) {
-  //   weekNumbers[i] = i + 1
-  //   budget[i] = 37756
-  //   accBudget[i] = 37756*(i+1)
-  // }
   var dates = []
   var sum = 0
   for (var i = 0; i < data.daySum.accDaySum.length; i++) {
-    var date = new Date(new Date().setDate(new Date().getDate()-(dayInMonth-1)+i))
+    var date = new Date(new Date().setDate(new Date().getDate()-(U.currentDayInMonth()-1)+i))
     dates[i] = date.toDateString().slice(3,10)
     budgetDays[i] = budget(date)
     // Math.round(151024/31)
