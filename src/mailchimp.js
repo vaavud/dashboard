@@ -2,6 +2,8 @@ var $ = require('jquery')
 var Highcharts = require('highcharts')
 var U = require('./utility.js')
 
+require("babel-polyfill")
+
 /*
 Retrieve Mailchimp data - included the 10 newest campaigns
 */
@@ -64,21 +66,21 @@ function report(data){
   return {"sentTo": sentTo, "title": title, "openRate": openRate, "clickRate": clickRate}
 }
 
-// Need some way to exclude BoD material
-function maxOpen(data){
-  var max = 0
-  var maxOpenTitle
-  var id
-  for (var i = 0; i < data["campaigns"].length; i++) {
-    if (max < data["campaigns"][i]["report_summary"]["open_rate"]) {
-      max = data["campaigns"][i]["report_summary"]["open_rate"]
-      maxOpenTitle = data["campaigns"][i]["settings"]["title"]
-      id = data["campaigns"][i]["id"]
-    }
-  }
-  // console.log("title: " + maxOpenTitle + ", id:" + id)
-  return {"max": max, "maxOpenTitle": maxOpenTitle}
-}
+// Idea to post the campaign with the highest open rate so far - NOT INCLUDED YET
+// function maxOpen(data){
+//   var max = 0
+//   var maxOpenTitle
+//   var id
+//   for (var i = 0; i < data["campaigns"].length; i++) {
+//     if (max < data["campaigns"][i]["report_summary"]["open_rate"]) {
+//       max = data["campaigns"][i]["report_summary"]["open_rate"]
+//       maxOpenTitle = data["campaigns"][i]["settings"]["title"]
+//       id = data["campaigns"][i]["id"]
+//     }
+//   }
+//   // console.log("title: " + maxOpenTitle + ", id:" + id)
+//   return {"max": max, "maxOpenTitle": maxOpenTitle}
+// }
 
 /* Plotting */
 function chartOptions(data) {
@@ -115,7 +117,7 @@ var chart = {
     crosshair: true
   }],
   yAxis: [{ // Primary yAxis
-      tickPositions: [0, 10000, 20000, 30000, 40000],
+      tickPositions: [0, 500, 1000, 1500, 2000],
       labels: {
         style: { color: '#000000' }
       },

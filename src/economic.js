@@ -2,6 +2,8 @@ var $ = require('jquery')
 var Highcharts = require('highcharts')
 var U = require('./utility.js')
 
+require("babel-polyfill")
+
 /*
 Retrive e-conomic data
 */

@@ -1,7 +1,7 @@
 {
   "name": "dashboard",
   "version": "1.0.0",
-  "description": "Dashboard for showing KPIs (Maria's thesis)",
+  "description": "Dashboard for showing Vaavud's KPIs (Maria's thesis)",
   "main": "main.js",
   "dependencies": {
     "firebase": "^2.4.1",

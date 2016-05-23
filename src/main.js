@@ -73,7 +73,7 @@ function retriveCredentials() {
 }
 
 /*
-Retrive external data and display it.
+Retrive external data and display it. 1 for each chart displayed.
 */
 function loadAndDisplayExternalData(credentials) {
     sales(credentials)
@@ -94,7 +94,7 @@ function sales(credentials) {
     })
 }
 
-// Active users from Amplitude and compared to last year data from Mixpanel
+// Active users from Amplitude and compared with last year data from Mixpanel
 function activeUsers(credentials) {
   var mixActiveUsers = Mixpanel.getData(credentials["Mixpanel"], "activeUsers");
   var activeUsers = Amplitude.getData(credentials["Amplitude-iOS"], credentials["Amplitude-Android"], "activeUsers");
@@ -120,7 +120,7 @@ function notifications(credentials) {
   })
 }
 
-// Measurements from Amplitude nd compared to last year data from Mixpanel
+// Measurements from Amplitude, compared to last year data from Mixpanel
 function measurements(credentials) {
   var mixMeasurements = Mixpanel.getData(credentials["Mixpanel"], "measurements");
   var measurements = Amplitude.getData(credentials["Amplitude-iOS"], credentials["Amplitude-Android"], "measurements");

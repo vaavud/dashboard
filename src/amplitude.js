@@ -3,6 +3,8 @@ var Highcharts = require('highcharts')
 var Mixpanel = require('./mixpanel.js')
 var U = require('./utility.js')
 
+require("babel-polyfill")
+
 
 /*
 Retrieve Amplitude data
@@ -103,15 +105,15 @@ function joinMixpanelAndAmplitude(data) {
 function chartOptions(data, title) {
   // console.log(data)
   // var options = chart
-  var options = chart
+  var options = chart1
 
-  if (title == "Downloads" || title == "Notifications added") {
-    options = chart1;
-  }
-
-  if (data.lastYear != null){
-    options.series[2].data = data.lastYear
-  }
+  // if (title == "Downloads" || title == "Notifications added") {
+  //   options = chart1;
+  // }
+  //
+  // if (data.lastYear != null){
+  //   options.series[2].data = data.lastYear
+  // }
 
   var dates = []
   for (var i = 0; i < U.const.DISPLAY_DAYS; i++) {

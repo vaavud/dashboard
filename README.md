@@ -1,2 +1,2 @@
 # dashboard
-Dashboard for showing KPI (Maria thesis)
+Dashboard for showing KPIs
