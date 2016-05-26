@@ -8,8 +8,6 @@ var Amplitude = require('./amplitude.js')
 var Mailchimp = require('./mailchimp.js')
 var Mixpanel = require('./mixpanel.js')
 
-require("babel-polyfill")
-
 /*
 Login to firebase
 */
@@ -33,15 +31,11 @@ $(document).ready(function() {
 
   })
 
-  // ref.authWithPassword({
-  //   email: email,
-  //   password: password
-  // }, authHandler);
-
   ref.authWithPassword({
-    email: 'maria@vaavud.com',
-    password: '1234'
+    email: email,
+    password: password
   }, authHandler);
+
 });
 
 /*

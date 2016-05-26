@@ -3,8 +3,6 @@ var Highcharts = require('highcharts')
 var Mixpanel = require('./mixpanel.js')
 var U = require('./utility.js')
 
-require("babel-polyfill")
-
 
 /*
 Retrieve Amplitude data

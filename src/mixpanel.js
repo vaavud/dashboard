@@ -2,8 +2,6 @@
 
 var $ = require('jquery')
 
-require("babel-polyfill")
-
 var displayDays = 28;
 var todayOj = new Date()
 /*
