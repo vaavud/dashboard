@@ -115,7 +115,7 @@ var chart = {
     crosshair: true
   }],
   yAxis: [{ // Primary yAxis
-      // tickPositions: [0, 500, 1000, 1500, 2000],
+      tickPositions: [0, 500, 1000, 1500, 2000],
       labels: {
         style: { color: '#000000' }
       },

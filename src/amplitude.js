@@ -82,7 +82,7 @@ function combinedData(data) { // 1 Array of arrays of data
 function joinMixpanelAndAmplitude(data) {
   var combined = new Array(U.const.DISPLAY_DAYS).fill(0)
   var combinedLM = new Array(U.const.DISPLAY_DAYS).fill(0)
-  var lastYear = data[0].mixpanelLastYear
+  // var lastYear = data[0].mixpanelLastYear
   var array = new Array(4);
   array[0] = data[0].mixpanelCMLM.combined;
   array[1] = data[1].combined;
@@ -96,7 +96,8 @@ function joinMixpanelAndAmplitude(data) {
       combinedLM[j] += t[j]
     }
   }
-  return {"combined": combined, "combinedLM": combinedLM, "lastYear": lastYear}
+  return {"combined": combined, "combinedLM": combinedLM}
+  // "lastYear": lastYear
 }
 
 

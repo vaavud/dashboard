@@ -8,6 +8,8 @@ var Amplitude = require('./amplitude.js')
 var Mailchimp = require('./mailchimp.js')
 var Mixpanel = require('./mixpanel.js')
 
+require("babel-polyfill")
+
 /*
 Login to firebase
 */
@@ -31,11 +33,15 @@ $(document).ready(function() {
 
   })
 
-  ref.authWithPassword({
-    email: email,
-    password: password
-  }, authHandler);
+  // ref.authWithPassword({
+  //   email: email,
+  //   password: password
+  // }, authHandler);
 
+  ref.authWithPassword({
+    email: 'maria@vaavud.com',
+    password: '1234'
+  }, authHandler);
 });
 
 /*
@@ -91,10 +97,11 @@ function sales(credentials) {
 // Active users from Amplitude and compared with last year data from Mixpanel
 function activeUsers(credentials) {
   var mixActiveUsers = Mixpanel.getData(credentials["Mixpanel"], "activeUsers");
+  console.log("mixpanle " + mixActiveUsers)
   var activeUsers = Amplitude.getData(credentials["Amplitude-iOS"], credentials["Amplitude-Android"], "activeUsers");
   Promise.all([mixActiveUsers, activeUsers])
     .then(data => {
-      console.log("test1" + data)
+      console.log("test1" + data.mixActiveUsers)
       return Amplitude.joinMixpanelAndAmplitude(data)
 
     })
