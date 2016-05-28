@@ -97,7 +97,7 @@ function chartOptions(data) {
 
 var chart = {
   chart: { type: 'bar' },
-  title: { text: 'Mailchimp campaigns' },
+  title: { text: 'Email campaigns' },
   // subtitle: { text: 'Source: mailchimp.com' },
   xAxis: [{
     useHTML: true,
