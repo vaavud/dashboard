@@ -135,22 +135,28 @@ function budget(date) {
 function budgetYTD() {
   var budgetM = 0
   var month = new Date().getMonth()
+  console.log("month " + month)
   var daysInMonth = U.daysInMonth(new Date())
+  console.log("daysInMonth " + daysInMonth)
   var dayBudget = 0
   var day = new Date().getDate()
+  console.log("day " + day)
 
-  if (month == 5 || month == 6 || month == 7 || month == 12) {
+  if (month == 5 || month == 6 || month == 7 || month == 11) {
     dayBudget = 76625 / daysInMonth
   } else {
     dayBudget = 151025 / daysInMonth
   }
   var extra = dayBudget * day;
+  console.log("extra " + extra)
   for (var i = 0; i < month; i++) {
-    if (month == 5 || month == 6 || month == 7 || month == 12) {
+    if (i == 5 || i == 6 || i == 7 || i == 11) {
       budgetM += 76625
     } else {
       budgetM += 151025
     }
+    console.log("i " + i)
+    console.log("budgetM " + budgetM)
   }
   var budgetYTD = Math.round(budgetM + extra)
   return budgetYTD;
@@ -163,7 +169,7 @@ function chartOptions(data) {
   var options = chart
   var budgetDays = []
   var accBudget = []
-  var budget_test = budgetYTD()
+  // var budget_test = budgetYTD()
   var dates = []
   var sum = 0
   for (var i = 0; i < daySum.length; i++) {
@@ -199,7 +205,7 @@ function renderer(data) {
         fontSize: '13px'
       })
       .add()
-    chart.renderer.text("Index: " + indexYTD, 100, 95)
+    chart.renderer.text("Index: " + indexYTD, 100, 90)
       .css({
         fontSize: '13px'
       })
